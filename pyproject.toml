@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyRET"
+authors = [
+	{ name = "Swarnabha Chattaraj", email = "schattaraj@anl.gov"},
+]
+description = "First-principles tools for radiative and nonradiative resonant energy transfer between localized defects."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { file = "LICENSE" }
+dependencies = [
+	"numpy",
+	"scipy",
+	"h5py",
+	"matplotlib",
+	"mpi4py",
+	"pyscf",
+    "sphinx",
+    "sphinx_rtd_theme",
+]
+version = "0.0"
+
+
+[project.scripts]
+pyRET_compute_matrix_elements = "pyRET.run:main"
+pyRET_load_wavefunctions_qe = "pyRET.loadWF_QE:main"
+pyRET_load_wavefunctions_atomic = "pyRET.loadWF_Atomic:main"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["pyRET*"]
