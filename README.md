@@ -33,7 +33,7 @@ pip install .
 
 # Usage
 
-Refer to the github-page for detailed documentation and usage examples.
+Refer to the github-page [https://chattarajs.github.io/py-RET/] for detailed documentation and usage examples. Also please check the example scripts in the `examples/` directory.
 
 # Authors
 Swarnabha Chattaraj (schattaraj@anl.gov) \
