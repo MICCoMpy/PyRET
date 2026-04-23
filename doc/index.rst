@@ -9,7 +9,7 @@ It is a code that captures radiative and non-radiative RET processes between loc
 **PyRET** is parallelized using mpi4py.
 
 
-**PyRET** is developed at the University of Chicago and Argonne National Laboratory. The development of **PyRET** is supported by the U.S. Department of Energy, Office of Science, for support of microelectronics research at the Extreme Lithography & Materials Innovation Center (ELMIC), under Contract No. DE-AC0206CH11357.
+**PyRET** is developed at the University of Chicago and Argonne National Laboratory. The development of **PyRET** is supported by the U.S. Department of Energy, Office of Science, for support of microelectronics research at the Extreme Lithography & Materials Innovation Center (ELMIC), under Contract No. DE-AC0206CH11357. Development of PyRET is a result of an active collaborative partnership between microelectronics research and MICCoM.
 
 
 ------------
