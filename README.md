@@ -40,5 +40,5 @@ Swarnabha Chattaraj (schattaraj@anl.gov) \
 Giulia Galli (gagalli@uchicago.edu)
 
 # Acknowledgements
-Development of this code was supported by the U.S. Department of Energy, Office of Science, for support of microelectronics research at the Extreme Lithography & Materials Innovation Center (ELMIC), under Contract No. DE-AC0206CH11357. It is done with active collaborative partnership with MiCCoM.
+Development of this code was supported by the U.S. Department of Energy, Office of Science, for support of microelectronics research at the Extreme Lithography & Materials Innovation Center (ELMIC), under Contract No. DE-AC0206CH11357. It is done with active collaborative partnership with MICCoM.
 
