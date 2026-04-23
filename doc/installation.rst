@@ -12,8 +12,8 @@ The basic packages of **PyRET** can be installed with pip. To install using **pi
 
 .. code-block:: bash
 
-   $ git clone https://github.com/chattarajs/py-RET
-   $ cd py-RET
+   $ git clone https://github.com/MICCoMpy/PyRET
+   $ cd PyRET
    $ pip install .
 
 **PyRET** depends on the following packages:
