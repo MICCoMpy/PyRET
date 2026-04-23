@@ -1,0 +1,11 @@
+*.pyc
+dist
+*.egg-info
+build/
+_build/
+env/
+venv/
+.ipynb_checkpoints
+.virtual_documents
+anaconda_projects
+__pycache__/
