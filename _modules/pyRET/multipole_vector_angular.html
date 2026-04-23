@@ -1,0 +1,642 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyRET.multipole_vector_angular &mdash; PyRET  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            PyRET
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../documentation.html">Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../credits.html">Credits</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PyRET</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pyRET.multipole_vector_angular</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyRET.multipole_vector_angular</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">Consts</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">special</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+
+<span class="c1">#Function to add vector spherical harmonics:</span>
+<div class="viewcode-block" id="addMP_VA">
+<a class="viewcode-back" href="../../documentation.html#pyRET.multipole_vector_angular.addMP_VA">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">addMP_VA</span><span class="p">(</span><span class="n">mps</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper function to add vector multipoles in a list.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        mps(list of MP_VA): list of MP_VA objects to be added together</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        MP_VA: combined MP_VA object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">jmax</span> <span class="o">=</span> <span class="n">mps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">jmax</span>
+    <span class="n">mpout</span> <span class="o">=</span> <span class="n">MP_VA</span><span class="p">(</span><span class="n">jmax</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">mp</span> <span class="ow">in</span> <span class="n">mps</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">jmax</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">j</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">lrange</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lrange</span> <span class="o">=</span> <span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+                
+            <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lrange</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">M</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">j</span><span class="p">,</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                    <span class="n">mpout</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">l</span><span class="p">][</span><span class="n">M</span><span class="p">]</span> <span class="o">=</span> <span class="n">mpout</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">l</span><span class="p">][</span><span class="n">M</span><span class="p">]</span><span class="o">+</span><span class="n">mp</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">l</span><span class="p">][</span><span class="n">M</span><span class="p">]</span>
+    
+    <span class="k">return</span> <span class="n">mpout</span></div>
+
+
+
+<span class="c1">#Function to add vector spherical harmonics:</span>
+<div class="viewcode-block" id="addMP_VA_Hansen">
+<a class="viewcode-back" href="../../documentation.html#pyRET.multipole_vector_angular.addMP_VA_Hansen">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">addMP_VA_Hansen</span><span class="p">(</span><span class="n">mps</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper function to add Hansen vector multipoles in a list.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mps(list of MP_VA_Hansen): list of MP_VA_Hansen objects</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        MP_VA_Hansen: combined MP_VA_Hansen object</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">jmax</span> <span class="o">=</span> <span class="n">mps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">jmax</span>
+    <span class="n">mpout</span> <span class="o">=</span> <span class="n">MP_VA_Hansen</span><span class="p">(</span><span class="n">jmax</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">mp</span> <span class="ow">in</span> <span class="n">mps</span><span class="p">:</span>
+        
+        
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">mpout</span><span class="o">.</span><span class="n">C</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span>  <span class="n">M</span><span class="p">,</span> <span class="n">value1</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">lam</span><span class="p">,</span> <span class="n">value2</span> <span class="ow">in</span> <span class="n">value1</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>     
+                    <span class="n">mpout</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">M</span><span class="p">][</span><span class="n">lam</span><span class="p">]</span> <span class="o">=</span> <span class="n">mpout</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">M</span><span class="p">][</span><span class="n">lam</span><span class="p">]</span><span class="o">+</span><span class="n">mp</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">M</span><span class="p">][</span><span class="n">lam</span><span class="p">]</span>
+                    
+    
+    <span class="k">return</span> <span class="n">mpout</span>        </div>
+
+        
+
+<span class="c1"># Multipolar vector angular class</span>
+<div class="viewcode-block" id="MP_VA">
+<a class="viewcode-back" href="../../documentation.html#pyRET.multipole_vector_angular.MP_VA">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MP_VA</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class representing Vector Multipole in angular coordinates with definite l values (j = Total angular momentum, l = orbital angular momentum, M = projected total angular momentum)</span>
+<span class="sd">    </span>
+<span class="sd">    Attributes:</span>
+<span class="sd">        C (dict of dict of dict of complex): Dictionary containing multupole coefficients C[j][l][M]</span>
+<span class="sd">        jmax (int): integer value of max angular momentum</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jmax</span><span class="p">):</span>
+        
+        <span class="n">C</span> <span class="o">=</span> <span class="p">{}</span>
+        
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">jmax</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">if</span> <span class="n">j</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">lrange</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lrange</span> <span class="o">=</span> <span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+            
+            <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lrange</span><span class="p">:</span>
+                
+                <span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">l</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                
+                <span class="k">for</span> <span class="n">M</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                    <span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">l</span><span class="p">][</span><span class="n">M</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span><span class="o">+</span><span class="mf">0.0</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">C</span> <span class="o">=</span> <span class="n">C</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jmax</span> <span class="o">=</span> <span class="n">jmax</span>
+        <span class="k">return</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">Encode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">Encoded</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;Class&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">})</span>
+        
+        <span class="n">jmax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jmax</span>
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;jmax&quot;</span><span class="p">:</span> <span class="n">jmax</span><span class="p">})</span>
+        
+        <span class="n">C</span> <span class="o">=</span>  <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">jmax</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">C</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">j</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">if</span> <span class="n">j</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">lrange</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lrange</span> <span class="o">=</span> <span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lrange</span><span class="p">:</span>
+                <span class="n">C</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">j</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">l</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">M</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                    <span class="n">C</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">j</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">l</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">M</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">l</span><span class="p">][</span><span class="n">M</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">l</span><span class="p">][</span><span class="n">M</span><span class="p">])]</span>
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="n">C</span><span class="p">})</span>
+        
+        <span class="k">return</span> <span class="n">Encoded</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">Decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;Class&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span>
+            <span class="n">clsname</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;Class&quot;</span><span class="p">]</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">clsname</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Wrong decoder function. The json objeect was from </span><span class="si">{</span><span class="n">clsname</span><span class="si">}</span><span class="s2"> class, but is being decoded by&quot;</span><span class="o">+</span>
+            <span class="sa">f</span><span class="s2">&quot;the decoder of the class </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">jmax</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;jmax&quot;</span><span class="p">]</span>
+        
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">jmax</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">j</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">lrange</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lrange</span> <span class="o">=</span> <span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lrange</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">M</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">l</span><span class="p">][</span><span class="n">M</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;C&quot;</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">j</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">l</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">M</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;C&quot;</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">j</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">l</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">M</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        
+        <span class="k">return</span> <span class="bp">self</span>
+         
+<div class="viewcode-block" id="MP_VA.decompose">
+<a class="viewcode-back" href="../../documentation.html#pyRET.multipole_vector_angular.MP_VA.decompose">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">decompose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">dtheta</span><span class="p">,</span> <span class="n">dphi</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Multipole decomposition of a given vector field</span>
+<span class="sd">        Args:</span>
+<span class="sd">            V (array of shape (3, Ntheta, Nphi)): Vector field over angular coordinates theta and phi. The first dimension is the vector component (r, theta, phi)</span>
+<span class="sd">            theta (array of shape (Ntheta, Nphi)): Theta coordinates</span>
+<span class="sd">            phi (array of shape (Ntheta, Nphi)): Phi coordinates</span>
+<span class="sd">            dtheta (float): step size in theta</span>
+<span class="sd">            dphi (float): step size in phi</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#Decompose V into spherical harmonics:</span>
+        <span class="c1">#Exploiting the orthogonality of the basis:</span>
+        
+        
+        <span class="k">for</span> <span class="n">keyj</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span>  <span class="n">keyl</span><span class="p">,</span> <span class="n">value1</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">keyM</span><span class="p">,</span> <span class="n">value2</span> <span class="ow">in</span> <span class="n">value1</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    
+                    <span class="c1">#Computing the integral of dot products:</span>
+                    <span class="n">yv</span> <span class="o">=</span> <span class="n">Yvect</span><span class="p">(</span><span class="n">keyj</span><span class="p">,</span> <span class="n">keyl</span><span class="p">,</span> <span class="n">keyM</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="p">)</span>
+                    
+                    <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">yv</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="n">V</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                               <span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">yv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">*</span><span class="n">V</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                               <span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">yv</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">*</span><span class="n">V</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span><span class="o">*</span><span class="n">dtheta</span><span class="o">*</span><span class="n">dphi</span><span class="p">)</span>
+                    <span class="n">value1</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">keyM</span><span class="p">:</span> <span class="n">c</span><span class="p">})</span>
+        <span class="k">return</span></div>
+
+    
+<div class="viewcode-block" id="MP_VA.vector">
+<a class="viewcode-back" href="../../documentation.html#pyRET.multipole_vector_angular.MP_VA.vector">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">vector</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Transform the multipole coefficients in vector form.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">V</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">keyj</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span>  <span class="n">keyl</span><span class="p">,</span> <span class="n">value1</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">keyM</span><span class="p">,</span> <span class="n">value2</span> <span class="ow">in</span> <span class="n">value1</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>        
+                    <span class="n">V</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">V</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="MP_VA.fromvector">
+<a class="viewcode-back" href="../../documentation.html#pyRET.multipole_vector_angular.MP_VA.fromvector">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fromvector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">V</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the object from a given complex vector.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">V</span><span class="p">)</span>
+        <span class="n">jmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">N</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">jmax</span> <span class="o">-</span> <span class="nb">round</span><span class="p">(</span><span class="n">jmax</span><span class="p">))</span><span class="o">&gt;</span><span class="mf">0.01</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Vector length not what is expected.. filling in absent elements with zeros&quot;</span><span class="p">)</span>
+        <span class="n">jmax</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">jmax</span><span class="p">))</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">jmax</span> <span class="o">=</span> <span class="n">jmax</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">jmax</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">if</span> <span class="n">j</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">lrange</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lrange</span> <span class="o">=</span> <span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+            
+            <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lrange</span><span class="p">:</span>
+                
+                <span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">l</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                
+                <span class="k">for</span> <span class="n">M</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">count</span><span class="o">&lt;</span><span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">V</span><span class="p">):</span>
+                        <span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">l</span><span class="p">][</span><span class="n">M</span><span class="p">]</span> <span class="o">=</span> <span class="n">V</span><span class="p">[</span><span class="n">count</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">L</span><span class="p">][</span><span class="n">M</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="o">+</span><span class="mi">0</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span>
+                    <span class="n">count</span> <span class="o">=</span> <span class="n">count</span><span class="o">+</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">C</span> <span class="o">=</span> <span class="n">C</span>
+        
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+    
+<div class="viewcode-block" id="MP_VA.absMP">
+<a class="viewcode-back" href="../../documentation.html#pyRET.multipole_vector_angular.MP_VA.absMP">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">absMP</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Absolute magnitude of sum of all (or specific angular components)</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            func (callable): A function that takes (j, l, M) and returns True if the component should be included.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">jmax</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">j</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">lrange</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lrange</span> <span class="o">=</span> <span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lrange</span><span class="p">:</span>
+                
+                <span class="k">for</span> <span class="n">M</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">j</span><span class="p">,</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">func</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">M</span><span class="p">):</span>
+                        <span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">l</span><span class="p">][</span><span class="n">M</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span>
+        
+        <span class="k">return</span> <span class="n">val</span></div>
+
+    
+<div class="viewcode-block" id="MP_VA.scale">
+<a class="viewcode-back" href="../../documentation.html#pyRET.multipole_vector_angular.MP_VA.scale">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">factor</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Scale all the coefficients with a specific constant (complex) factor.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            factor (complex): The scaling factor.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#print(self.C)</span>
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">val1</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">l</span><span class="p">,</span> <span class="n">val2</span> <span class="ow">in</span> <span class="n">val1</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">M</span><span class="p">,</span> <span class="n">val3</span> <span class="ow">in</span> <span class="n">val2</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">l</span><span class="p">][</span><span class="n">M</span><span class="p">]</span><span class="o">=</span><span class="n">factor</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">l</span><span class="p">][</span><span class="n">M</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+
+<div class="viewcode-block" id="MP_VA.toMP_VA_Hansen">
+<a class="viewcode-back" href="../../documentation.html#pyRET.multipole_vector_angular.MP_VA.toMP_VA_Hansen">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">toMP_VA_Hansen</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Transfer the MP_VA class object to the MP_VA_Hansen object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mpvajM</span> <span class="o">=</span> <span class="n">MP_VA_Hansen</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jmax</span><span class="p">)</span>
+        <span class="n">jmax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jmax</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">jmax</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">M</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                <span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">M</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">if</span> <span class="n">j</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="c1">#lam=0</span>
+                    <span class="c1">#C[j][M][0] = 0</span>
+                    <span class="c1">#lam=1</span>
+                    <span class="c1">#C[j][M][1] = np.sqrt((j)/(2*j+1)) * self.C[j][1][M]</span>
+                    <span class="c1">#lam=-1</span>
+                    <span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">M</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="n">M</span><span class="p">]</span>
+                    
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1">#lam=0</span>
+                    <span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">M</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="n">M</span><span class="p">]</span>
+                    <span class="c1">#lam=1</span>
+                    <span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">M</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">M</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">j</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">][</span><span class="n">M</span><span class="p">]</span>
+                    <span class="c1">#lam=-1</span>
+                    <span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">M</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">j</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">M</span><span class="p">]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">][</span><span class="n">M</span><span class="p">]</span>
+                    
+                    
+                        
+        <span class="n">mpvajM</span><span class="o">.</span><span class="n">C</span> <span class="o">=</span> <span class="n">C</span>            
+                    
+        <span class="k">return</span> <span class="n">mpvajM</span></div>
+
+    
+<div class="viewcode-block" id="MP_VA.plotamp">
+<a class="viewcode-back" href="../../documentation.html#pyRET.multipole_vector_angular.MP_VA.plotamp">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">plotamp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">jmax</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot the multipole coefficients of vector multipoles</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">xvals</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">yvals</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">colorvals</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="s2">&quot;red&quot;</span><span class="p">,</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span><span class="s2">&quot;green&quot;</span><span class="p">,</span><span class="s2">&quot;cyan&quot;</span><span class="p">,</span><span class="s2">&quot;orange&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">jmax</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+             <span class="n">jmax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jmax</span>
+        <span class="c1">#Plot the C coefficients on to the axis that is passed as an argument</span>
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">val1</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">j</span><span class="o">&gt;</span><span class="n">jmax</span><span class="p">:</span>
+                <span class="k">break</span>
+                
+            <span class="k">for</span> <span class="n">l</span><span class="p">,</span> <span class="n">val2</span> <span class="ow">in</span> <span class="n">val1</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">M</span><span class="p">,</span> <span class="n">val3</span> <span class="ow">in</span> <span class="n">val2</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">xvals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="n">j</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span><span class="mi">6</span><span class="o">*</span><span class="n">j</span> <span class="o">+</span><span class="p">(</span><span class="n">l</span><span class="o">-</span><span class="n">j</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">M</span><span class="o">*</span><span class="mf">0.9</span><span class="p">)</span>
+                    <span class="n">yvals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">val3</span><span class="p">))</span>
+                    <span class="n">colors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">colorvals</span><span class="p">[</span><span class="nb">abs</span><span class="p">(</span><span class="n">M</span><span class="p">)])</span>
+                    <span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">j</span><span class="si">=}</span><span class="s2">,</span><span class="si">{</span><span class="n">l</span><span class="si">=}</span><span class="s2">,</span><span class="si">{</span><span class="n">M</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+        <span class="n">axis</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">xvals</span><span class="p">,</span> <span class="n">yvals</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span> <span class="n">colors</span><span class="p">)</span>
+        
+        <span class="n">axis</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">xvals</span><span class="p">)</span>
+        <span class="n">axis</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">)</span>
+        
+        <span class="k">return</span></div>
+
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="n">MPcopy</span> <span class="o">=</span> <span class="n">MP_VA</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jmax</span><span class="p">)</span>
+        <span class="n">MPcopy</span><span class="o">.</span><span class="n">C</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">MPcopy</span></div>
+
+    
+
+<span class="c1"># Multipolar vector angular (Hansen type) class (modes with fixed j and M):</span>
+<div class="viewcode-block" id="MP_VA_Hansen">
+<a class="viewcode-back" href="../../documentation.html#pyRET.multipole_vector_angular.MP_VA_Hansen">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MP_VA_Hansen</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class representing Hansen Vector Multipole (Angular only) in j , M basis</span>
+<span class="sd">    (j = Total angular momentum, M = projected total angular momentum, lam = a parameter to determine which mode-- longitudinal(-1), and two transverse (0, 1)  </span>
+<span class="sd">    </span>
+<span class="sd">    Attributes:</span>
+<span class="sd">        C (dict of dict of dict of complex): Dictionary containing multupole coefficients C[j][M][lam]</span>
+<span class="sd">        jmax (int): integer value of max angular momentum</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+   
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jmax</span><span class="p">):</span>
+        
+        <span class="n">C</span> <span class="o">=</span> <span class="p">{}</span>
+        
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">jmax</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">j</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">M</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                    <span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">M</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="k">for</span> <span class="n">lam</span> <span class="ow">in</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+                        <span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">M</span><span class="p">][</span><span class="n">lam</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span><span class="o">+</span><span class="mf">0.0</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">M</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                    <span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">M</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="k">for</span> <span class="n">lam</span> <span class="ow">in</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                        <span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">M</span><span class="p">][</span><span class="n">lam</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span><span class="o">+</span><span class="mf">0.0</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span>
+            
+        <span class="bp">self</span><span class="o">.</span><span class="n">C</span> <span class="o">=</span> <span class="n">C</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jmax</span> <span class="o">=</span> <span class="n">jmax</span>
+        <span class="k">return</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">Encode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">Encoded</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;Class&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">})</span>
+        
+        <span class="n">jmax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jmax</span>
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;jmax&quot;</span><span class="p">:</span> <span class="n">jmax</span><span class="p">})</span>
+        
+        <span class="n">C</span> <span class="o">=</span>  <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">jmax</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">C</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">j</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">j</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">M</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                    <span class="n">C</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">j</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">M</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="k">for</span> <span class="n">lam</span> <span class="ow">in</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+                        <span class="n">C</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">j</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">M</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lam</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">M</span><span class="p">][</span><span class="n">lam</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">M</span><span class="p">][</span><span class="n">lam</span><span class="p">])]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">M</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                    <span class="n">C</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">j</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">M</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="k">for</span> <span class="n">lam</span> <span class="ow">in</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                        <span class="n">C</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">j</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">M</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lam</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">M</span><span class="p">][</span><span class="n">lam</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">M</span><span class="p">][</span><span class="n">lam</span><span class="p">])]</span>
+
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="n">C</span><span class="p">})</span>        
+        <span class="k">return</span> <span class="n">Encoded</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">Decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;Class&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span>
+            <span class="n">clsname</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;Class&quot;</span><span class="p">]</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">clsname</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Wrong decoder function. The json objeect was from </span><span class="si">{</span><span class="n">clsname</span><span class="si">}</span><span class="s2"> class, but is being decoded by&quot;</span><span class="o">+</span>
+            <span class="sa">f</span><span class="s2">&quot;the decoder of the class </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">jmax</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;jmax&quot;</span><span class="p">]</span>
+        
+        
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">jmax</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">j</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">M</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">lam</span> <span class="ow">in</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">M</span><span class="p">][</span><span class="n">lam</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;C&quot;</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">j</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">M</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lam</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;C&quot;</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">j</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">M</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lam</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">M</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">lam</span> <span class="ow">in</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">M</span><span class="p">][</span><span class="n">lam</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;C&quot;</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">j</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">M</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lam</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;C&quot;</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">j</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">M</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lam</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        
+        <span class="k">return</span> <span class="bp">self</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">decompose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">dtheta</span><span class="p">,</span> <span class="n">dphi</span><span class="p">):</span>
+        
+        <span class="k">for</span> <span class="n">keyj</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span>  <span class="n">keyM</span><span class="p">,</span> <span class="n">value1</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">keylam</span><span class="p">,</span> <span class="n">value2</span> <span class="ow">in</span> <span class="n">value1</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    
+                    <span class="c1">#Computing the integral of dot products:</span>
+                    <span class="n">yv</span> <span class="o">=</span> <span class="n">Yvect_Hansen</span><span class="p">(</span><span class="n">keyj</span><span class="p">,</span> <span class="n">keyM</span><span class="p">,</span> <span class="n">keylam</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="p">)</span>
+                    
+                    <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">yv</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="n">V</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                               <span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">yv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">*</span><span class="n">V</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                               <span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">yv</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">*</span><span class="n">V</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span><span class="o">*</span><span class="n">dtheta</span><span class="o">*</span><span class="n">dphi</span><span class="p">)</span>
+                    <span class="n">value1</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">keylam</span><span class="p">:</span> <span class="n">c</span><span class="p">})</span>
+        <span class="k">return</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">vector</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="n">V</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">keyj</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span>  <span class="n">keyM</span><span class="p">,</span> <span class="n">value1</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">keylam</span><span class="p">,</span> <span class="n">value2</span> <span class="ow">in</span> <span class="n">value1</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>        
+                    <span class="n">V</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">V</span><span class="p">)</span>    
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">fromvector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">V</span><span class="p">):</span>
+        
+        <span class="n">N</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">V</span><span class="p">)</span>
+        <span class="n">jmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">N</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">jmax</span> <span class="o">-</span> <span class="nb">round</span><span class="p">(</span><span class="n">jmax</span><span class="p">))</span><span class="o">&gt;</span><span class="mf">0.01</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Vector length not what is expected.. filling in absent elements with zeros&quot;</span><span class="p">)</span>
+        <span class="n">jmax</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">jmax</span><span class="p">))</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">jmax</span> <span class="o">=</span> <span class="n">jmax</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">jmax</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">M</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                <span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">M</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">j</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">lam</span> <span class="ow">in</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+                        <span class="k">if</span> <span class="n">count</span><span class="o">&lt;</span><span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">V</span><span class="p">):</span>
+                            <span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">M</span><span class="p">][</span><span class="n">lam</span><span class="p">]</span> <span class="o">=</span> <span class="n">V</span><span class="p">[</span><span class="n">count</span><span class="p">]</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">M</span><span class="p">][</span><span class="n">lam</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="o">+</span><span class="mi">0</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span>
+                        <span class="n">count</span> <span class="o">=</span> <span class="n">count</span><span class="o">+</span><span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">lam</span> <span class="ow">in</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                        <span class="k">if</span> <span class="n">count</span><span class="o">&lt;</span><span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">V</span><span class="p">):</span>
+                            <span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">M</span><span class="p">][</span><span class="n">lam</span><span class="p">]</span> <span class="o">=</span> <span class="n">V</span><span class="p">[</span><span class="n">count</span><span class="p">]</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">M</span><span class="p">][</span><span class="n">lam</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="o">+</span><span class="mi">0</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span>
+                        <span class="n">count</span> <span class="o">=</span> <span class="n">count</span><span class="o">+</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">C</span> <span class="o">=</span> <span class="n">C</span>
+        
+        <span class="k">return</span> <span class="bp">self</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">factor</span><span class="p">):</span>
+        
+        <span class="k">for</span> <span class="n">val1</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">val2</span> <span class="ow">in</span> <span class="n">val1</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">val3</span> <span class="ow">in</span> <span class="n">val2</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                    <span class="n">val3</span><span class="o">=</span><span class="n">val3</span><span class="o">*</span><span class="n">factor</span>
+        <span class="k">return</span> <span class="bp">self</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">toMP_VA</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="n">mpva</span> <span class="o">=</span> <span class="n">MP_VA</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jmax</span><span class="p">)</span>
+        <span class="n">jmax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jmax</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">jmax</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">if</span> <span class="n">j</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">l</span><span class="o">=</span><span class="mi">1</span>
+                    
+                <span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">l</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                    
+                <span class="k">for</span> <span class="n">M</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                    <span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">l</span><span class="p">][</span><span class="n">M</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">M</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> 
+                    
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lrange</span> <span class="o">=</span> <span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>      
+                <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lrange</span><span class="p">:</span>
+                    
+                    <span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">l</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                    
+                    <span class="k">for</span> <span class="n">M</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">j</span> <span class="o">==</span> <span class="n">l</span><span class="p">:</span>
+                            <span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">l</span><span class="p">][</span><span class="n">M</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">M</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="n">j</span><span class="o">+</span><span class="mi">1</span> <span class="o">==</span> <span class="n">l</span><span class="p">:</span>
+                            <span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">l</span><span class="p">][</span><span class="n">M</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">M</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">j</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">M</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="n">j</span><span class="o">-</span><span class="mi">1</span> <span class="o">==</span> <span class="n">l</span><span class="p">:</span>
+                            <span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">l</span><span class="p">][</span><span class="n">M</span><span class="p">]</span> <span class="o">=</span>   <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">M</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">j</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">M</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">mpva</span><span class="o">.</span><span class="n">C</span> <span class="o">=</span> <span class="n">C</span>            
+                    
+        <span class="k">return</span> <span class="n">mpva</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="n">MPcopy</span> <span class="o">=</span> <span class="n">MP_VA_Hansen</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jmax</span><span class="p">)</span>
+        <span class="n">MPcopy</span><span class="o">.</span><span class="n">C</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">MPcopy</span></div>
+
+    
+
+    
+        
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, University of Chicago and Argonne National Laboratory.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

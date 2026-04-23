@@ -1,0 +1,612 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyRET.wavefunctions &mdash; PyRET  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            PyRET
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../documentation.html">Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../credits.html">Credits</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PyRET</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pyRET.wavefunctions</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyRET.wavefunctions</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">special</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">h5py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.fields</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+
+<div class="viewcode-block" id="WFunction">
+<a class="viewcode-back" href="../../documentation.html#pyRET.wavefunctions.WFunction">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">WFunction</span><span class="p">():</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class representing  a Wavefunction</span>
+<span class="sd">    </span>
+<span class="sd">    Attributes:</span>
+<span class="sd">        isGamma(bool): True if the wavefuncton is at Gamma point</span>
+<span class="sd">        Gs(numpy array): numpy complex array shape (3, NG) denoting the G vectors for plane wave expansion </span>
+<span class="sd">        evcCs(numpy array): numpy complex array of shape (1, NG) - plane wave expansion coefficients for a specific KS state</span>
+<span class="sd">        NG(int): int storing number of plane waves</span>
+<span class="sd">        isplanewave(bool): True when the plane wave expansion exists.</span>
+<span class="sd">        MPField(SField): SField object storing the multipole expanded scalar field. can be empty, in that case isplanewave = True</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">    Methods:</span>
+<span class="sd">        __init__(): Initialization</span>
+<span class="sd">        Encode(): encodes to jsonizable data</span>
+<span class="sd">        Decode(data): decodes from json data</span>
+<span class="sd">        readfromhdf5(self, filename, iKS, cpA): reads a specific KS state iKS into the plane wave basis </span>
+<span class="sd">            from a hdf5 file generrated by quantum espresso. cpA = cell parameter block.</span>
+<span class="sd">        readfromhdf5_parallel(self, filename, iKS, cpA, comm):reads a specific KS state iKS into the plane wave basis </span>
+<span class="sd">            from a hdf5 file generrated by quantum espresso. cpA = cell parameter block. Uses parallel hdf5.</span>
+<span class="sd">        torgrid(self, rgrid, istart = 0, istep = 1, kparity=1): Calculates values at coordinate space.</span>
+<span class="sd">            istart and istep can be used to skip over plane waves. kparity is the parity in k-space- specifically relevant</span>
+<span class="sd">            for calculating at Gamma point.</span>
+<span class="sd">        getharmonics(self, lmax): Using the plane wave basis, analytically creates a Scalar Field object into the attr. MPField</span>
+<span class="sd">        scale(fact): Scales the Wavefunction by a complex scalar fact and returns a copy.</span>
+<span class="sd">        copy(): deep copy</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="WFunction.__init__">
+<a class="viewcode-back" href="../../documentation.html#pyRET.wavefunctions.WFunction.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="c1">#Defined based on a planne wave basis</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">isGamma</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Gs</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">evcCs</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">NG</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">isplanewave</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="c1">#Definition in the multipole basis</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MPField</span> <span class="o">=</span> <span class="n">SField</span><span class="p">()</span>
+        
+            
+        <span class="k">return</span></div>
+
+       
+<div class="viewcode-block" id="WFunction.Encode">
+<a class="viewcode-back" href="../../documentation.html#pyRET.wavefunctions.WFunction.Encode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">Encode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">Encoded</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;Class&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">})</span>
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;isGamma&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">isGamma</span><span class="p">})</span>
+        
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;Gs(Real)&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Gs</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()})</span>
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;Gs(Imag)&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Gs</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()})</span>
+        
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;evcCs(Real)&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evcCs</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()})</span>
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;evcCs(Imag)&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evcCs</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()})</span>
+        
+        
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;NG&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">NG</span><span class="p">})</span>
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;isplanewave&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">isplanewave</span><span class="p">})</span>
+        
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;MPField&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">MPField</span><span class="o">.</span><span class="n">Encode</span><span class="p">()})</span>
+        
+        <span class="k">return</span> <span class="n">Encoded</span></div>
+
+    
+<div class="viewcode-block" id="WFunction.Decode">
+<a class="viewcode-back" href="../../documentation.html#pyRET.wavefunctions.WFunction.Decode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">Decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;Class&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span>
+            <span class="n">clsname</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;Class&quot;</span><span class="p">]</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">clsname</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Wrong decoder function. The json objeect was from </span><span class="si">{</span><span class="n">clsname</span><span class="si">}</span><span class="s2"> class, but is being decoded by&quot;</span><span class="o">+</span>
+            <span class="sa">f</span><span class="s2">&quot;the decoder of the class </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">isGamma</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;isGamma&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Gs(Imag)&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Gs(Real)&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Gs</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Gs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;Gs(Real)&quot;</span><span class="p">])</span><span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;Gs(Imag)&quot;</span><span class="p">])</span>
+            
+        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;evcCs(Real)&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;evcCs(Imag)&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">evcCs</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">evcCs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;evcCs(Real)&quot;</span><span class="p">])</span><span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;evcCs(Imag)&quot;</span><span class="p">])</span>
+        
+        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;NG&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">NG</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">NG</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;NG&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">isplanewave</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;isplanewave&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MPField</span><span class="o">.</span><span class="n">Decode</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;MPField&quot;</span><span class="p">))</span>
+        
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+    
+<div class="viewcode-block" id="WFunction.readfromhdf5">
+<a class="viewcode-back" href="../../documentation.html#pyRET.wavefunctions.WFunction.readfromhdf5">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">readfromhdf5</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">iKS</span><span class="p">,</span> <span class="n">cpA</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reads the plane waves from hdf5 file</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            filename (str): path to the hdf5 file containing the plane wave expansion of the wavefunction</span>
+<span class="sd">            iKS (int): index of the KS state to be read from the hdf5</span>
+<span class="sd">            cpA (array-like): cell parameter block</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+    
+        <span class="n">aA</span> <span class="o">=</span> <span class="n">cpA</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">bcrystal</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span><span class="n">aA</span> <span class="o">*</span> <span class="mf">1e10</span>
+        <span class="c1">#For now, lets assume that it is a cubic unit cell to estimate the reciproal lattice vectors:</span>
+    
+    
+    
+        <span class="c1">#Read the miller indices and the coefficients from the hdf5 file</span>
+        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">Gs</span> <span class="o">=</span> <span class="n">bcrystal</span><span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s2">&quot;MillerIndices&quot;</span><span class="p">]),</span> <span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">evc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s2">&quot;evc&quot;</span><span class="p">])</span>
+        <span class="n">NG</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">Gs</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    
+    
+        <span class="c1">#Isolate the real and imaginary parts of evc:</span>
+        <span class="n">evcR</span> <span class="o">=</span> <span class="n">evc</span><span class="p">[</span><span class="n">iKS</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">Gs</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="mi">2</span><span class="p">)]</span>
+        <span class="n">evcI</span> <span class="o">=</span> <span class="n">evc</span><span class="p">[</span><span class="n">iKS</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">Gs</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="mi">2</span><span class="p">)]</span>
+        <span class="c1">#Define complex miller index:</span>
+        <span class="n">evcC</span> <span class="o">=</span> <span class="n">evcR</span><span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">evcI</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Gs</span> <span class="o">=</span> <span class="n">Gs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">evcCs</span> <span class="o">=</span> <span class="n">evcC</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">NG</span> <span class="o">=</span> <span class="n">NG</span>
+        
+        <span class="c1">#Check if the Gs contains the parity also:</span>
+        
+        <span class="c1">#Find a G that is not zero:</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">Gs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">isGamma</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">isGamma</span> <span class="o">=</span> <span class="kc">True</span>
+        
+                
+        <span class="bp">self</span><span class="o">.</span><span class="n">isplanewave</span> <span class="o">=</span> <span class="kc">True</span>    
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+    
+<div class="viewcode-block" id="WFunction.readfromhdf5_parallel">
+<a class="viewcode-back" href="../../documentation.html#pyRET.wavefunctions.WFunction.readfromhdf5_parallel">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">readfromhdf5_parallel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">iKS</span><span class="p">,</span> <span class="n">cpA</span><span class="p">,</span> <span class="n">comm</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reads the plane waves from hdf5 file in parallel</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            filename (str): path to the hdf5 file containing the plane wave expansion of the wavefunction</span>
+<span class="sd">            iKS (int): index of the KS state to be read from the hdf5</span>
+<span class="sd">            cpA (array-like): cell parameter block</span>
+<span class="sd">            comm (MPI.Comm): MPI communicator for parallel reading</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+    
+        <span class="n">aA</span> <span class="o">=</span> <span class="n">cpA</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">bcrystal</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span><span class="n">aA</span> <span class="o">*</span> <span class="mf">1e10</span>
+        <span class="c1">#For now, lets assume that it is a cubic unit cell to estimate the reciproal lattice vectors:</span>
+    
+    
+    
+        <span class="c1">#Read the miller indices and the coefficients from the hdf5 file</span>
+        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">driver</span> <span class="o">=</span> <span class="s2">&quot;mpio&quot;</span><span class="p">,</span> <span class="n">comm</span> <span class="o">=</span> <span class="n">comm</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">Gs</span> <span class="o">=</span> <span class="n">bcrystal</span><span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s2">&quot;MillerIndices&quot;</span><span class="p">]),</span> <span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">evc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s2">&quot;evc&quot;</span><span class="p">])</span>
+        <span class="n">NG</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">Gs</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    
+    
+        <span class="c1">#Isolate the real and imaginary parts of evc:</span>
+        <span class="n">evcR</span> <span class="o">=</span> <span class="n">evc</span><span class="p">[</span><span class="n">iKS</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">Gs</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="mi">2</span><span class="p">)]</span>
+        <span class="n">evcI</span> <span class="o">=</span> <span class="n">evc</span><span class="p">[</span><span class="n">iKS</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">Gs</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="mi">2</span><span class="p">)]</span>
+        <span class="c1">#Define complex miller index:</span>
+        <span class="n">evcC</span> <span class="o">=</span> <span class="n">evcR</span><span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">evcI</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Gs</span> <span class="o">=</span> <span class="n">Gs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">evcCs</span> <span class="o">=</span> <span class="n">evcC</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">NG</span> <span class="o">=</span> <span class="n">NG</span>
+        
+        <span class="c1">#Check if the Gs contains the parity also:</span>
+        
+        <span class="c1">#Find a G that is not zero:</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">Gs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">isGamma</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">isGamma</span> <span class="o">=</span> <span class="kc">True</span>
+        
+                
+        <span class="bp">self</span><span class="o">.</span><span class="n">isplanewave</span> <span class="o">=</span> <span class="kc">True</span>    
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+    
+<div class="viewcode-block" id="WFunction.readfromdat">
+<a class="viewcode-back" href="../../documentation.html#pyRET.wavefunctions.WFunction.readfromdat">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">readfromdat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">iKS</span><span class="p">,</span> <span class="n">cpA</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reads the plane waves from a .dat file</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            filename (str): path to the .dat file containing the plane wave expansion of the wavefunction</span>
+<span class="sd">            iKS (int): index of the KS state to be read from the .dat file</span>
+<span class="sd">            cpA (array-like): cell parameter block</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">aA</span> <span class="o">=</span> <span class="n">cpA</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">bcrystal</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span><span class="n">aA</span> <span class="o">*</span> <span class="mf">1e10</span>
+        
+        <span class="c1">#Import the G and EVC array from the wavefunction file</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="c1"># Moves the cursor 4 bytes to the right</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+
+            <span class="n">ik</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int32&#39;</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">xk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float64&#39;</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+            <span class="n">ispin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int32&#39;</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">gamma_only</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int32&#39;</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">scalef</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float64&#39;</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="c1"># Move the cursor 8 byte to the right</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+            <span class="n">ngw</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int32&#39;</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">igwx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int32&#39;</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">npol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int32&#39;</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">nbnd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int32&#39;</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="c1"># Move the cursor 8 byte to the right</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+            <span class="n">b1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float64&#39;</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+            <span class="n">b2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float64&#39;</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+            <span class="n">b3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float64&#39;</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+            <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+            
+            <span class="n">mill</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int32&#39;</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">3</span><span class="o">*</span><span class="n">igwx</span><span class="p">)</span>
+            <span class="n">mill</span> <span class="o">=</span> <span class="n">mill</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span> <span class="p">(</span><span class="n">igwx</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="p">)</span> 
+
+            <span class="n">evc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span> <span class="p">(</span><span class="n">nbnd</span><span class="p">,</span> <span class="n">npol</span><span class="o">*</span><span class="n">igwx</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;complex128&quot;</span><span class="p">)</span>
+
+            <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbnd</span><span class="p">):</span>
+                <span class="n">evc</span><span class="p">[</span><span class="n">i</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;complex128&#39;</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="n">npol</span><span class="o">*</span><span class="n">igwx</span><span class="p">)</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">bcrystal</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span><span class="n">aA</span> <span class="o">*</span> <span class="mf">1e10</span>
+        <span class="n">Gs</span> <span class="o">=</span> <span class="n">bcrystal</span> <span class="o">*</span> <span class="n">mill</span><span class="o">.</span><span class="n">T</span>
+
+       
+        <span class="bp">self</span><span class="o">.</span><span class="n">Gs</span> <span class="o">=</span> <span class="n">Gs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">evcCs</span> <span class="o">=</span> <span class="n">evc</span><span class="p">[</span><span class="n">iKS</span><span class="o">-</span><span class="mi">1</span><span class="p">,:]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">isGamma</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">NG</span> <span class="o">=</span> <span class="n">Gs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">isplanewave</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+    
+
+<div class="viewcode-block" id="WFunction.torgrid">
+<a class="viewcode-back" href="../../documentation.html#pyRET.wavefunctions.WFunction.torgrid">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">torgrid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rgrid</span><span class="p">,</span> <span class="n">istart</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">istep</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">kparity</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Project the wavefunction from the plane wave basis onto a user specified position grid.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            rgrid (array-like): 3 x N array of coordinates where the wavefunction needs to be evaluated.</span>
+<span class="sd">            istart (int, optional): Starting index for plane wave summation. Defaults to 0.</span>
+<span class="sd">            istep (int, optional): Step size for plane wave summation. Defaults to 1.</span>
+<span class="sd">            kparity (int, optional): Parity in k-space, relevant for Gamma point. Defaults to 1.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">xgrid</span> <span class="o">=</span> <span class="n">rgrid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">psi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">xgrid</span><span class="p">),</span><span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;complex&#39;</span><span class="p">)</span>
+        
+        <span class="c1">#print(self.Gs)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isplanewave</span><span class="p">:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            If the wavefunction already exists in the plane wave basis, </span>
+<span class="sd">            then just use the plane wave basis</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="c1">#print(&quot;plane wave basis&quot;)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isGamma</span><span class="p">:</span>
+                <span class="n">psi</span> <span class="o">=</span> <span class="n">psi</span><span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">evcCs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">tensordot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Gs</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">rgrid</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)))</span>
+
+                <span class="k">for</span> <span class="n">iG</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">istart</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">NG</span><span class="p">,</span><span class="n">istep</span><span class="p">):</span>
+                    <span class="n">psi</span> <span class="o">=</span> <span class="p">(</span><span class="n">psi</span><span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">evcCs</span><span class="p">[</span><span class="n">iG</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">tensordot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Gs</span><span class="p">[:,</span><span class="n">iG</span><span class="p">],</span> <span class="n">rgrid</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)))</span>
+                          <span class="o">+</span><span class="n">kparity</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evcCs</span><span class="p">[</span><span class="n">iG</span><span class="p">])</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">tensordot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Gs</span><span class="p">[:,</span><span class="n">iG</span><span class="p">],</span> <span class="n">rgrid</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">))))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">iG</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">istart</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">NG</span><span class="p">,</span> <span class="n">istep</span><span class="p">):</span>
+
+                    <span class="n">psi</span> <span class="o">=</span> <span class="p">(</span><span class="n">psi</span><span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">evcCs</span><span class="p">[</span><span class="n">iG</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">tensordot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Gs</span><span class="p">[:,</span><span class="n">iG</span><span class="p">],</span> <span class="n">rgrid</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">))))</span>
+        <span class="k">else</span><span class="p">:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Use directly the multipoles to create the radial part</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="c1">#print(f&quot;WFunction- torgrid-- directly evaluating from multipoles and radial functions&quot;)</span>
+            <span class="n">psi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MPField</span><span class="o">.</span><span class="n">torgrid</span><span class="p">(</span><span class="n">rgrid</span><span class="p">)</span>
+            
+        <span class="k">return</span> <span class="n">psi</span></div>
+
+    
+<div class="viewcode-block" id="WFunction.kpsitorgrid">
+<a class="viewcode-back" href="../../documentation.html#pyRET.wavefunctions.WFunction.kpsitorgrid">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">kpsitorgrid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rgrid</span><span class="p">,</span> <span class="n">istart</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">istep</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dr</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates k  operating on psi over a specific position grid. This is useful for calculating the momentum matrix elements.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rgrid (array-like): 3 x N array of coordinates where the wavefunction needs to be evaluated.</span>
+<span class="sd">            istart (int, optional): Starting index for plane wave summation. Defaults to 0.</span>
+<span class="sd">            istep (int, optional): Step size for plane wave summation. Defaults to 1.</span>
+<span class="sd">            dr (float, optional): Finite difference step size for numerical differentiation when plane wave basis is not available. Defaults to None, in which case a small value of 1e-12 is used.</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isplanewave</span><span class="p">:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            If the plane wave expansion already exists</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="c1">#print(&quot;plane wave basis&quot;)</span>
+            <span class="n">kpsi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">rgrid</span><span class="p">),</span><span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;complex&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isGamma</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">iG</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">istart</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">NG</span><span class="p">,</span> <span class="n">istep</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">icomp</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+                        <span class="n">kpsi</span><span class="p">[</span><span class="n">icomp</span><span class="p">]</span> <span class="o">=</span> <span class="n">kpsi</span><span class="p">[</span><span class="n">icomp</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">Gs</span><span class="p">[</span><span class="n">icomp</span><span class="p">,</span> <span class="n">iG</span><span class="p">]</span><span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">evcCs</span><span class="p">[</span><span class="n">iG</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">tensordot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Gs</span><span class="p">[:,</span><span class="n">iG</span><span class="p">],</span> <span class="n">rgrid</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)))</span>\
+                        <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">Gs</span><span class="p">[</span><span class="n">icomp</span><span class="p">,</span> <span class="n">iG</span><span class="p">]</span><span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evcCs</span><span class="p">[</span><span class="n">iG</span><span class="p">])</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">tensordot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Gs</span><span class="p">[:,</span><span class="n">iG</span><span class="p">],</span> <span class="n">rgrid</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)))</span>
+
+            <span class="k">return</span> <span class="n">kpsi</span>
+
+        <span class="k">else</span><span class="p">:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            if the plane wave basis has not been defined and only the spherical harmonics with or without the Atomic wavefunctions are there</span>
+<span class="sd">            ** Fully numeric evaluation of k psi</span>
+<span class="sd">            </span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="c1">#print(f&quot;WFunction- kpsitorgrid-- Full numerical evaluation&quot;)</span>
+            <span class="n">xgrid</span> <span class="o">=</span> <span class="n">rgrid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">ygrid</span> <span class="o">=</span> <span class="n">rgrid</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">zgrid</span> <span class="o">=</span> <span class="n">rgrid</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            
+            <span class="k">if</span> <span class="n">dr</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">dx</span> <span class="o">=</span> <span class="n">dy</span> <span class="o">=</span> <span class="n">dz</span> <span class="o">=</span> <span class="mf">1e-12</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dx</span> <span class="o">=</span> <span class="n">dy</span> <span class="o">=</span> <span class="n">dz</span> <span class="o">=</span> <span class="n">dr</span>
+            
+            <span class="n">rgridp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">rgrid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">dx</span><span class="p">,</span> <span class="n">rgrid</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">rgrid</span><span class="p">[</span><span class="mi">2</span><span class="p">]])</span>
+            <span class="n">rgridm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">rgrid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">dx</span><span class="p">,</span> <span class="n">rgrid</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">rgrid</span><span class="p">[</span><span class="mi">2</span><span class="p">]])</span>
+            
+            <span class="n">delxpsir</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">torgrid</span><span class="p">(</span><span class="n">rgridp</span><span class="p">)</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">torgrid</span><span class="p">(</span><span class="n">rgridm</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">dx</span><span class="p">)</span>
+            
+            <span class="n">rgridp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">rgrid</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rgrid</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">dy</span><span class="p">,</span> <span class="n">rgrid</span><span class="p">[</span><span class="mi">2</span><span class="p">]])</span>
+            <span class="n">rgridm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">rgrid</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rgrid</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">dy</span><span class="p">,</span> <span class="n">rgrid</span><span class="p">[</span><span class="mi">2</span><span class="p">]])</span>
+            
+            <span class="n">delypsir</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">torgrid</span><span class="p">(</span><span class="n">rgridp</span><span class="p">)</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">torgrid</span><span class="p">(</span><span class="n">rgridm</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">dy</span><span class="p">)</span>
+            
+            <span class="n">rgridp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">rgrid</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rgrid</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">rgrid</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">+</span><span class="n">dz</span><span class="p">])</span>
+            <span class="n">rgridm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">rgrid</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rgrid</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">rgrid</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">dz</span><span class="p">])</span>
+            
+            <span class="n">delzpsir</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">torgrid</span><span class="p">(</span><span class="n">rgridp</span><span class="p">)</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">torgrid</span><span class="p">(</span><span class="n">rgridm</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">dz</span><span class="p">)</span>
+            
+            
+            <span class="n">kpsi</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">delxpsir</span><span class="p">,</span> <span class="n">delypsir</span><span class="p">,</span> <span class="n">delzpsir</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">kpsi</span></div>
+
+                       
+<div class="viewcode-block" id="WFunction.getharmonics">
+<a class="viewcode-back" href="../../documentation.html#pyRET.wavefunctions.WFunction.getharmonics">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">getharmonics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lmax</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Computes multipole expansion of the wavefunction using the plane wave expansion coefficients. This is done by using the identity that a plane wave can be expanded in terms of spherical harmonics and spherical Bessel functions. The resulting multipole expansion is stored in the MPField attribute of the wavefunction object.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            lmax (int): maximum angular momentum quantum number for the multipole expansion</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">Gs</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error in getharmonics- plane wave expansion not defined yet&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        
+        <span class="n">Gabsall</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Gs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">Gs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">Gs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">Gabs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">Gabsall</span><span class="p">)</span>
+        <span class="n">Nunq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">Gabs</span><span class="p">)</span>
+        
+        
+        <span class="n">indices</span>  <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">Gabs</span><span class="p">:</span>
+            <span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Gabsall</span> <span class="o">==</span> <span class="n">val</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+        
+        
+        <span class="n">MPs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1">#Initialize the MPField of the wavefunction so that we do not accidentally double add things</span>
+        <span class="n">MPField</span> <span class="o">=</span> <span class="n">SField</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Nunq</span><span class="p">):</span>
+            <span class="n">MPField</span><span class="o">.</span><span class="n">add_component</span><span class="p">(</span><span class="n">Gabs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">lmax</span><span class="p">,</span>  <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;J&quot;</span><span class="p">})</span>
+            <span class="n">mps</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                <span class="n">mp</span> <span class="o">=</span> <span class="n">MP_SA</span><span class="p">(</span><span class="n">lmax</span><span class="p">)</span>
+                
+                <span class="k">if</span> <span class="n">Gabs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                    <span class="n">theta</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="n">phi</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="n">mp</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">Y</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="p">))</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">evcCs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">G</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Gs</span><span class="p">[:,</span> <span class="n">index</span><span class="p">]</span>
+                    <span class="n">Gnorm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+                    
+                    <span class="c1">#Evaluating polar coordingates</span>
+                    <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">G</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">/</span><span class="n">Gnorm</span><span class="p">)</span>
+                    <span class="n">temp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">G</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">G</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                    
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">temp</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">G</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">temp</span><span class="p">)</span> 
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">phi</span> <span class="o">=</span> <span class="mi">0</span>
+                        
+                    <span class="n">phi</span> <span class="o">=</span> <span class="n">phi</span> <span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">phi</span><span class="o">*</span><span class="p">(</span><span class="n">G</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">)</span>
+                    
+                    
+                    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">isGamma</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">lmax</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                            <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">l</span><span class="p">,</span><span class="n">l</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                                <span class="n">mp</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="n">l</span><span class="p">][</span><span class="n">m</span><span class="p">]</span> <span class="o">=</span>  <span class="bp">self</span><span class="o">.</span><span class="n">evcCs</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">Y</span><span class="p">(</span><span class="n">l</span><span class="p">,</span><span class="n">m</span><span class="p">,</span><span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="p">))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">lmax</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                            <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">l</span><span class="p">,</span><span class="n">l</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                                <span class="n">mp</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="n">l</span><span class="p">][</span><span class="n">m</span><span class="p">]</span> <span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">evcCs</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">Y</span><span class="p">(</span><span class="n">l</span><span class="p">,</span><span class="n">m</span><span class="p">,</span><span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="p">))</span> \
+                                            <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evcCs</span><span class="p">[</span><span class="n">index</span><span class="p">])</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">Y</span><span class="p">(</span><span class="n">l</span><span class="p">,</span><span class="n">m</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">-</span><span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span>
+                                
+
+                
+                <span class="n">mps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mp</span><span class="p">)</span>
+                
+            <span class="n">MPField</span><span class="o">.</span><span class="n">mps</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">addMP</span><span class="p">(</span><span class="n">mps</span><span class="p">)</span>
+            
+            <span class="c1">#MPs.append(addMP(mps))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">MPField</span> <span class="o">=</span> <span class="n">MPField</span>
+        <span class="k">return</span> <span class="n">MPField</span></div>
+
+    
+<div class="viewcode-block" id="WFunction.copy">
+<a class="viewcode-back" href="../../documentation.html#pyRET.wavefunctions.WFunction.copy">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Deep copy Wavefunction</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">wfcopy</span> <span class="o">=</span> <span class="n">WFunction</span><span class="p">()</span>
+        
+        <span class="n">wfcopy</span><span class="o">.</span><span class="n">isGamma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">isGamma</span>
+        <span class="n">wfcopy</span><span class="o">.</span><span class="n">Gs</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Gs</span><span class="p">)</span>
+        <span class="n">wfcopy</span><span class="o">.</span><span class="n">evcCs</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evcCs</span><span class="p">)</span>
+        <span class="n">wfcopy</span><span class="o">.</span><span class="n">NG</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">NG</span>
+        <span class="n">wfcopy</span><span class="o">.</span><span class="n">MPField</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MPField</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">wfcopy</span><span class="o">.</span><span class="n">isplanewave</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">isplanewave</span>
+        
+        <span class="k">return</span> <span class="n">wfcopy</span></div>
+
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wf1</span><span class="p">):</span>
+        
+        <span class="n">wfout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isplanewave</span><span class="p">:</span>
+            <span class="c1">#This means plane wave basis:</span>
+            
+            <span class="n">wfout</span><span class="o">.</span><span class="n">evcCs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evcCs</span> <span class="o">+</span> <span class="n">wf1</span><span class="o">.</span><span class="n">evcCs</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1">#This means only scalar field present</span>
+            <span class="n">wfout</span><span class="o">.</span><span class="n">MPField</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MPField</span> <span class="o">+</span> <span class="n">wf1</span><span class="o">.</span><span class="n">MPField</span>
+            
+        <span class="k">return</span> <span class="n">wfout</span>
+    
+<div class="viewcode-block" id="WFunction.scale">
+<a class="viewcode-back" href="../../documentation.html#pyRET.wavefunctions.WFunction.scale">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fact</span><span class="p">):</span>
+        
+        <span class="n">wfout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isplanewave</span><span class="p">:</span>
+            <span class="c1">#This means plane wave basis:</span>
+            
+            <span class="n">wfout</span><span class="o">.</span><span class="n">evcCs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evcCs</span><span class="o">*</span><span class="n">fact</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1">#This means only scalar field present</span>
+            <span class="n">wfout</span><span class="o">.</span><span class="n">MPField</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MPField</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">fact</span><span class="p">)</span>
+            
+        <span class="k">return</span> <span class="n">wfout</span></div>
+</div>
+
+        
+    
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, University of Chicago and Argonne National Laboratory.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

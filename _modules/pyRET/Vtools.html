@@ -1,0 +1,969 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyRET.Vtools &mdash; PyRET  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            PyRET
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../documentation.html">Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../credits.html">Credits</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PyRET</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pyRET.Vtools</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyRET.Vtools</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="c1">#import h5py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">Consts</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.wavefunctions</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.data_classes</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.emfieldtools</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="c1">#import json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.parallel_dot</span><span class="w"> </span><span class="kn">import</span> <span class="n">dot_n_VF_par</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.parallel_dot</span><span class="w"> </span><span class="kn">import</span> <span class="n">dot_n_SF_par</span>
+
+<div class="viewcode-block" id="hasWF">
+<a class="viewcode-back" href="../../documentation.html#pyRET.Vtools.hasWF">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">hasWF</span><span class="p">(</span><span class="n">em</span><span class="p">,</span> <span class="n">WF_data</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if the WF_data contains the wavefunction data for the emitter type em</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        em (str): Emitter type</span>
+<span class="sd">        WF_data (list): List of wavefunction data objects</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: True if the wavefunction data for the emitter type em is found in WF_data, False otherwise</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">WF_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">WF_data</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">em</span> <span class="ow">in</span> <span class="n">item</span><span class="o">.</span><span class="n">emitterTypes</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+    
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="whichWF">
+<a class="viewcode-back" href="../../documentation.html#pyRET.Vtools.whichWF">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">whichWF</span><span class="p">(</span><span class="n">em</span><span class="p">,</span> <span class="n">statei</span><span class="p">,</span> <span class="n">statef</span><span class="p">,</span> <span class="n">WF_data</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Find the indices of the Wavefunction data that corresponds to the states of a specific transition.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        em (str): Emitter type</span>
+<span class="sd">        statei (str): Initial state of the transition</span>
+<span class="sd">        statef (str): Final state of the transition</span>
+<span class="sd">        WF_data (list): List of wavefunction data objects</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        iwfdatai (int): Index of the WF_data object that contains the wavefunction data for the initial state</span>
+<span class="sd">        iemi (int): Index of the emitter type in the WF_data object that contains the wavefunction data for the initial state</span>
+<span class="sd">        iwfdataf (int): Index of the WF_data object that contains the wavefunction data for the final state</span>
+<span class="sd">        iemf (int): Index of the emitter type in the WF_data object that contains the wavefunction data for the final state</span>
+<span class="sd">    &quot;&quot;&quot;</span>    
+    <span class="k">for</span> <span class="n">iwf</span><span class="p">,</span> <span class="n">wfd</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">WF_data</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">em</span> <span class="ow">in</span> <span class="n">wfd</span><span class="o">.</span><span class="n">emitterTypes</span><span class="p">:</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">wfd</span><span class="o">.</span><span class="n">emitterTypes</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">em</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">statei</span> <span class="ow">in</span> <span class="n">wfd</span><span class="o">.</span><span class="n">states</span><span class="p">[</span><span class="n">index</span><span class="p">]:</span>
+                <span class="n">iwfdatai</span> <span class="o">=</span> <span class="n">iwf</span>
+                <span class="n">iemi</span> <span class="o">=</span> <span class="n">index</span>
+            <span class="k">if</span> <span class="n">statef</span> <span class="ow">in</span> <span class="n">wfd</span><span class="o">.</span><span class="n">states</span><span class="p">[</span><span class="n">index</span><span class="p">]:</span>
+                <span class="n">iwfdataf</span> <span class="o">=</span> <span class="n">iwf</span>
+                <span class="n">iemf</span> <span class="o">=</span> <span class="n">index</span>
+            
+    
+    <span class="k">return</span> <span class="n">iwfdatai</span><span class="p">,</span> <span class="n">iemi</span><span class="p">,</span> <span class="n">iwfdataf</span><span class="p">,</span> <span class="n">iemf</span></div>
+
+
+<div class="viewcode-block" id="computeV">
+<a class="viewcode-back" href="../../documentation.html#pyRET.Vtools.computeV">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">computeV</span><span class="p">(</span>
+        <span class="n">absorber_id</span><span class="p">,</span>
+        <span class="n">emitter_id</span><span class="p">,</span>
+        <span class="n">absorber_transitions</span><span class="p">,</span>
+        <span class="n">ws</span><span class="p">,</span>
+        <span class="n">Lmax</span><span class="p">,</span>
+        <span class="n">Em_data</span><span class="p">,</span>
+        <span class="n">Pos_data</span><span class="p">,</span>
+        <span class="n">WF_data</span><span class="p">,</span>
+        <span class="n">radtype_abs</span> <span class="o">=</span> <span class="s2">&quot;H1&quot;</span><span class="p">,</span>
+        <span class="n">parallel</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">Hint</span> <span class="o">=</span> <span class="s2">&quot;Adotp&quot;</span><span class="p">,</span>
+        <span class="p">):</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function computes the V matrix elements for a given set of transitions and photon energies. It checks if the wavefunction data for the absorber is available in the WF_data, and if so, it uses the wavefunction data to compute the V matrix elements. If not, it uses known multipole moments to compute the V matrix elements. The function can also handle both self-interaction (where the emitter and absorber are the same) and distant interaction (where the emitter and absorber are different) cases. The computed V matrix elements are stored in a V_data object and returned at the end of the function.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        absorber_id (str): Identifier for the absorber</span>
+<span class="sd">        emitter_id (str): Identifier for the emitter</span>
+<span class="sd">        absorber_transitions (list): List of transitions for the absorber</span>
+<span class="sd">        ws (numpy array): Array of photon angular frequencies (rad/s)</span>
+<span class="sd">        Lmax (int): Maximum multipole order to consider for the calculation of V</span>
+<span class="sd">        Em_data (Emitters_data): Object of the Emitters_data class</span>
+<span class="sd">        Pos_data (Positions_data or Positions_data_1config): Object of the Positions_data or Positions_data_1config class</span>
+<span class="sd">        WF_data (list of WFunctions_data): List of objects of WFunctions_data class</span>
+<span class="sd">        radtype_abs (str, optional): Type of radial function to use for the absorber. Options are &quot;J&quot; or &quot;H1&quot;. Defaults to &quot;H1&quot;.</span>
+<span class="sd">        parallel (bool, optional): Whether to use parallel processing. Defaults to True.</span>
+<span class="sd">        Hint (str, optional): Type of interaction Hamiltonian to use. Options are &quot;Adotp&quot; or &quot;Edotr&quot;. Defaults to &quot;Adotp&quot;.</span>
+
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        Vdata (V_data): Object of the V_data class containing the computed matrix elements.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+
+    <span class="k">if</span> <span class="n">parallel</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">mpi4py</span><span class="w"> </span><span class="kn">import</span> <span class="n">MPI</span>
+        <span class="n">comm</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span>
+        <span class="n">rank</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">Get_size</span><span class="p">()</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">Wtime</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">rank</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        
+    <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> 
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;######################################### </span><span class="se">\n\n\n\n</span><span class="s2">&quot;</span><span class="o">+</span>
+          <span class="sa">f</span><span class="s2">&quot;Computing V for energy transfer to </span><span class="si">{</span><span class="n">absorber_id</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">emitter_id</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">+</span>
+          <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">absorber_id</span><span class="si">}</span><span class="s2"> has transitions </span><span class="si">{</span><span class="n">absorber_transitions</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+          <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">emitter_id</span><span class="si">}</span><span class="s2"> Emits at omega =  </span><span class="si">{</span><span class="n">ws</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    
+    <span class="n">ems</span> <span class="o">=</span> <span class="p">[</span><span class="n">absorber_id</span><span class="p">,</span> <span class="n">emitter_id</span><span class="p">]</span>
+    
+    
+    <span class="n">consts</span> <span class="o">=</span> <span class="n">Consts</span><span class="p">()</span>
+    <span class="c1">#Initialize data structure</span>
+    <span class="n">Vdata</span> <span class="o">=</span> <span class="n">V_data</span><span class="p">()</span>
+    <span class="n">Vdata</span><span class="o">.</span><span class="n">ws</span><span class="p">[</span><span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">Vdata</span><span class="o">.</span><span class="n">ws</span><span class="p">[</span><span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">ems</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">ws</span>
+
+    <span class="n">Vdata</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">Vdata</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">ems</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+    
+    
+    <span class="n">Nw</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">ws</span><span class="p">)</span>
+    <span class="n">nIndex</span> <span class="o">=</span> <span class="n">Em_data</span><span class="o">.</span><span class="n">nIndex</span><span class="p">[</span><span class="n">ems</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+    <span class="n">ks</span> <span class="o">=</span> <span class="n">ws</span><span class="o">*</span><span class="n">nIndex</span><span class="o">/</span><span class="n">consts</span><span class="o">.</span><span class="n">c</span>
+    <span class="c1">#kem1 = Em_data.k[ems[1]]</span>
+    <span class="c1">#Self Interaction (Multipole center same as the absorber)</span>
+    <span class="k">if</span> <span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">ems</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2"> Multipole center same as the absorber. Using J-Bessel functions.&quot;</span><span class="p">)</span>
+        
+        <span class="c1">#Checking if an emitter is in the WFdata array</span>
+        <span class="n">absorber_type</span> <span class="o">=</span> <span class="n">Em_data</span><span class="o">.</span><span class="n">EmType</span><span class="p">[</span><span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="c1">#If wavefunction exists:</span>
+        <span class="k">if</span> <span class="n">hasWF</span><span class="p">(</span><span class="n">absorber_type</span><span class="p">,</span> <span class="n">WF_data</span><span class="p">):</span><span class="c1">#ems[0] in WF_data.emitters:</span>
+            <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Wavefunction data exist for absorber&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">trans</span> <span class="ow">in</span> <span class="n">absorber_transitions</span><span class="p">:</span>
+                <span class="n">Vdata</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">ems</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="n">trans</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="c1">#Get the wavefunction for the corresponding transition</span>
+                <span class="n">statei</span> <span class="o">=</span> <span class="n">trans</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-to-&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">statef</span> <span class="o">=</span> <span class="n">trans</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-to-&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Now calculating for transition </span><span class="si">{</span><span class="n">trans</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">statei</span><span class="si">=}</span><span class="s2"> </span><span class="si">{</span><span class="n">statef</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+                
+                <span class="c1">#Find the correspinding WFdata files and emitter indices for statei and statef</span>
+                <span class="n">iwfdatai</span><span class="p">,</span><span class="n">iemi</span><span class="p">,</span><span class="n">iwfdataf</span><span class="p">,</span> <span class="n">iemf</span> <span class="o">=</span> <span class="n">whichWF</span><span class="p">(</span><span class="n">absorber_type</span><span class="p">,</span> <span class="n">statei</span><span class="p">,</span> <span class="n">statef</span><span class="p">,</span> <span class="n">WF_data</span><span class="p">)</span> 
+                <span class="n">wfri</span> <span class="o">=</span> <span class="n">WF_data</span><span class="p">[</span><span class="n">iwfdatai</span><span class="p">]</span><span class="o">.</span><span class="n">Ns</span><span class="p">[</span><span class="n">iemi</span><span class="p">][</span><span class="n">statei</span><span class="p">]</span><span class="o">*</span><span class="n">WF_data</span><span class="p">[</span><span class="n">iwfdatai</span><span class="p">]</span><span class="o">.</span><span class="n">wfrs</span><span class="p">[</span><span class="n">iemi</span><span class="p">][</span><span class="n">statei</span><span class="p">]</span>
+                <span class="n">wfrf</span> <span class="o">=</span> <span class="n">WF_data</span><span class="p">[</span><span class="n">iwfdataf</span><span class="p">]</span><span class="o">.</span><span class="n">Ns</span><span class="p">[</span><span class="n">iemf</span><span class="p">][</span><span class="n">statef</span><span class="p">]</span><span class="o">*</span><span class="n">WF_data</span><span class="p">[</span><span class="n">iwfdataf</span><span class="p">]</span><span class="o">.</span><span class="n">wfrs</span><span class="p">[</span><span class="n">iemf</span><span class="p">][</span><span class="n">statef</span><span class="p">]</span>
+                <span class="n">kwfri</span> <span class="o">=</span> <span class="n">WF_data</span><span class="p">[</span><span class="n">iwfdatai</span><span class="p">]</span><span class="o">.</span><span class="n">Ns</span><span class="p">[</span><span class="n">iemi</span><span class="p">][</span><span class="n">statei</span><span class="p">]</span><span class="o">*</span><span class="n">WF_data</span><span class="p">[</span><span class="n">iwfdatai</span><span class="p">]</span><span class="o">.</span><span class="n">kwfrs</span><span class="p">[</span><span class="n">iemi</span><span class="p">][</span><span class="n">statei</span><span class="p">]</span>
+                <span class="n">kwfrf</span> <span class="o">=</span> <span class="n">WF_data</span><span class="p">[</span><span class="n">iwfdataf</span><span class="p">]</span><span class="o">.</span><span class="n">Ns</span><span class="p">[</span><span class="n">iemf</span><span class="p">][</span><span class="n">statef</span><span class="p">]</span><span class="o">*</span><span class="n">WF_data</span><span class="p">[</span><span class="n">iwfdataf</span><span class="p">]</span><span class="o">.</span><span class="n">kwfrs</span><span class="p">[</span><span class="n">iemf</span><span class="p">][</span><span class="n">statef</span><span class="p">]</span>
+                <span class="n">rgridwf</span> <span class="o">=</span>  <span class="n">WF_data</span><span class="p">[</span><span class="n">iwfdatai</span><span class="p">]</span><span class="o">.</span><span class="n">rgridwf</span><span class="p">[</span><span class="n">iemi</span><span class="p">]</span>
+                <span class="n">dV</span> <span class="o">=</span> <span class="p">(</span><span class="n">rgridwf</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span><span class="n">rgridwf</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="p">(</span><span class="n">rgridwf</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span><span class="n">rgridwf</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="p">(</span><span class="n">rgridwf</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span><span class="n">rgridwf</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span> 
+                
+                
+                <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Wavefunctions found in WFdata.&quot;</span><span class="p">)</span>
+                    
+                <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">Lmax</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                    <span class="n">Vdata</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">ems</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="n">trans</span><span class="p">][</span><span class="n">L</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="k">for</span> <span class="n">M</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">L</span><span class="p">,</span> <span class="n">L</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                        <span class="n">Vdata</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">ems</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="n">trans</span><span class="p">][</span><span class="n">L</span><span class="p">][</span><span class="n">M</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                        <span class="k">for</span> <span class="n">P</span> <span class="ow">in</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+                            
+                            <span class="n">Vdata</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">ems</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="n">trans</span><span class="p">][</span><span class="n">L</span><span class="p">][</span><span class="n">M</span><span class="p">][</span><span class="n">P</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">Nw</span><span class="p">),</span> <span class="n">dtype</span> <span class="o">=</span> <span class="nb">complex</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Calculating V for </span><span class="si">{</span><span class="n">L</span><span class="si">=}</span><span class="s2"> </span><span class="si">{</span><span class="n">M</span><span class="si">=}</span><span class="s2"> </span><span class="si">{</span><span class="n">P</span><span class="si">=}</span><span class="s2">. Dimension </span><span class="si">{</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">Nw</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                           
+                            <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Spectral response for </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">ks</span><span class="p">)</span><span class="si">}</span><span class="s2"> k-points for the photon&quot;</span><span class="p">)</span>
+                            <span class="k">for</span> <span class="n">ik</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ks</span><span class="p">):</span>
+
+                                <span class="n">Vdata</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">ems</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="n">trans</span><span class="p">][</span><span class="n">L</span><span class="p">][</span><span class="n">M</span><span class="p">][</span><span class="n">P</span><span class="p">][:,:,</span><span class="n">ik</span><span class="p">]</span> <span class="o">=</span> \
+                                    <span class="n">V12_par</span><span class="p">(</span><span class="n">wfri</span><span class="p">,</span>
+                                            <span class="n">kwfri</span><span class="p">,</span>
+                                            <span class="n">wfrf</span><span class="p">,</span>
+                                            <span class="n">kwfrf</span><span class="p">,</span>
+                                            <span class="n">rgridwf</span><span class="p">,</span>
+                                            <span class="n">k</span><span class="p">,</span>
+                                            <span class="n">L</span><span class="p">,</span>
+                                            <span class="n">M</span><span class="p">,</span>
+                                            <span class="n">P</span><span class="p">,</span>
+                                            <span class="n">nIndex</span><span class="p">,</span>
+                                            <span class="n">Cgauge</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                                            <span class="n">Hint</span> <span class="o">=</span> <span class="n">Hint</span><span class="p">,</span>
+                                            <span class="n">rshift</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
+                                            <span class="n">radtype</span> <span class="o">=</span> <span class="s2">&quot;J&quot;</span><span class="p">,</span>
+                                            <span class="n">dV</span> <span class="o">=</span> <span class="n">dV</span><span class="p">,</span>
+                                            <span class="n">parallel</span> <span class="o">=</span> <span class="n">parallel</span><span class="p">,)</span>
+
+                    
+        <span class="c1">#If wavefunction does not exists:</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Wavefunction data does not exist for absorber- using known multipoles instead&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">trans</span> <span class="ow">in</span> <span class="n">absorber_transitions</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Now calculating for transition </span><span class="si">{</span><span class="n">trans</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">Vdata</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">ems</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="n">trans</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">Lmax</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                    <span class="n">Vdata</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">ems</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="n">trans</span><span class="p">][</span><span class="n">L</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="k">for</span> <span class="n">M</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">L</span><span class="p">,</span> <span class="n">L</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                        <span class="n">Vdata</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">ems</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="n">trans</span><span class="p">][</span><span class="n">L</span><span class="p">][</span><span class="n">M</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                        <span class="k">for</span> <span class="n">P</span> <span class="ow">in</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+                            <span class="n">Vdata</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">ems</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="n">trans</span><span class="p">][</span><span class="n">L</span><span class="p">][</span><span class="n">M</span><span class="p">][</span><span class="n">P</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">Nw</span><span class="p">),</span> <span class="n">dtype</span> <span class="o">=</span> <span class="nb">complex</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Calculating V for </span><span class="si">{</span><span class="n">L</span><span class="si">=}</span><span class="s2"> </span><span class="si">{</span><span class="n">M</span><span class="si">=}</span><span class="s2"> </span><span class="si">{</span><span class="n">P</span><span class="si">=}</span><span class="s2">. Dimension </span><span class="si">{</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">Nw</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                            
+                            <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Spectral response for </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">ks</span><span class="p">)</span><span class="si">}</span><span class="s2"> k-points for the photon&quot;</span><span class="p">)</span>
+                            <span class="k">for</span> <span class="n">ik</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ks</span><span class="p">):</span>
+
+                                <span class="k">if</span> <span class="s2">&quot;ED&quot;</span> <span class="ow">in</span> <span class="n">trans</span><span class="p">:</span>
+                                    <span class="n">Vdata</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">ems</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="n">trans</span><span class="p">][</span><span class="n">L</span><span class="p">][</span><span class="n">M</span><span class="p">][</span><span class="n">P</span><span class="p">][:,:,</span><span class="n">ik</span><span class="p">]</span> <span class="o">=</span> \
+                                        <span class="n">V12_ED</span><span class="p">(</span><span class="n">Em_data</span><span class="o">.</span><span class="n">pMPs</span><span class="p">[</span><span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">trans</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="p">,</span><span class="n">k</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span><span class="n">nIndex</span><span class="p">,</span>  <span class="s2">&quot;J&quot;</span><span class="p">,</span> <span class="n">Cgauge</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+                                <span class="k">else</span><span class="p">:</span>
+                                    <span class="n">Vdata</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">ems</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="n">trans</span><span class="p">][</span><span class="n">L</span><span class="p">][</span><span class="n">M</span><span class="p">][</span><span class="n">P</span><span class="p">][:,:,</span><span class="n">ik</span><span class="p">]</span> <span class="o">=</span> \
+                                        <span class="n">V12_MD</span><span class="p">(</span><span class="n">Em_data</span><span class="o">.</span><span class="n">pMPs</span><span class="p">[</span><span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">trans</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="p">,</span><span class="n">k</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span><span class="n">nIndex</span><span class="p">,</span>  <span class="s2">&quot;J&quot;</span><span class="p">,</span> <span class="n">Cgauge</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+
+
+    
+    <span class="c1">#Distant Interaction (Multipole center NOT same as the absorber)</span>
+    <span class="k">else</span><span class="p">:</span>
+        
+        <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Multipole center not same as the absorber. Using Hankel functions. Relative positions defined in Pos_data dataclass&quot;</span><span class="p">)</span>
+        
+        <span class="c1">#if the position data is in the classical notation where each pair have multiple configurations</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">Pos_data</span><span class="p">,</span> <span class="n">Positions_data</span><span class="p">):</span>
+            <span class="c1">#Creating the full rvect matrix with the rgrid:</span>
+            <span class="k">if</span> <span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">Pos_data</span><span class="o">.</span><span class="n">Rvects</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">ems</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">Pos_data</span><span class="o">.</span><span class="n">Rvects</span><span class="p">[</span><span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">Rvects</span> <span class="o">=</span> <span class="n">Pos_data</span><span class="o">.</span><span class="n">Rvects</span><span class="p">[</span><span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">ems</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+
+            <span class="k">elif</span> <span class="n">ems</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">Pos_data</span><span class="o">.</span><span class="n">Rvects</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">Pos_data</span><span class="o">.</span><span class="n">Rvects</span><span class="p">[</span><span class="n">ems</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">Rvects</span> <span class="o">=</span> <span class="o">-</span> <span class="n">Pos_data</span><span class="o">.</span><span class="n">Rvects</span><span class="p">[</span><span class="n">ems</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">Pos_data</span><span class="p">,</span> <span class="n">Positions_data_1config</span><span class="p">):</span>
+            <span class="n">iabs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">Em_data</span><span class="o">.</span><span class="n">EmType</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">iemit</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">Em_data</span><span class="o">.</span><span class="n">EmType</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">ems</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">Rvects</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">Pos_data</span><span class="o">.</span><span class="n">Rvects</span><span class="p">[:,</span><span class="n">iabs</span><span class="p">,</span> <span class="n">iemit</span><span class="p">],</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+            
+            
+            
+        <span class="c1">#Checking if an emitter is in the WFdata array</span>
+        <span class="n">absorber_type</span> <span class="o">=</span> <span class="n">Em_data</span><span class="o">.</span><span class="n">EmType</span><span class="p">[</span><span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        
+        <span class="c1">#If wavefunction exists:</span>
+        <span class="k">if</span> <span class="n">hasWF</span><span class="p">(</span><span class="n">absorber_type</span><span class="p">,</span> <span class="n">WF_data</span><span class="p">):</span><span class="c1">#ems[0] in WF_data.emitters:</span>
+            <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Wavefunction data exist for absorber&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">trans</span> <span class="ow">in</span> <span class="n">absorber_transitions</span><span class="p">:</span>
+                <span class="n">Vdata</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">ems</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="n">trans</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="c1">#Get the wavefunction for the corresponding transition</span>
+                <span class="n">statei</span> <span class="o">=</span> <span class="n">trans</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-to-&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">statef</span> <span class="o">=</span> <span class="n">trans</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-to-&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Now calculating for transition </span><span class="si">{</span><span class="n">trans</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">statei</span><span class="si">=}</span><span class="s2"> </span><span class="si">{</span><span class="n">statef</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+                
+                <span class="c1">#Find the correspinding WFdata files and emitter indices for statei and statef</span>
+                <span class="n">iwfdatai</span><span class="p">,</span><span class="n">iemi</span><span class="p">,</span><span class="n">iwfdataf</span><span class="p">,</span> <span class="n">iemf</span> <span class="o">=</span> <span class="n">whichWF</span><span class="p">(</span><span class="n">absorber_type</span><span class="p">,</span> <span class="n">statei</span><span class="p">,</span> <span class="n">statef</span><span class="p">,</span> <span class="n">WF_data</span><span class="p">)</span> 
+                <span class="n">wfri</span> <span class="o">=</span> <span class="n">WF_data</span><span class="p">[</span><span class="n">iwfdatai</span><span class="p">]</span><span class="o">.</span><span class="n">Ns</span><span class="p">[</span><span class="n">iemi</span><span class="p">][</span><span class="n">statei</span><span class="p">]</span><span class="o">*</span><span class="n">WF_data</span><span class="p">[</span><span class="n">iwfdatai</span><span class="p">]</span><span class="o">.</span><span class="n">wfrs</span><span class="p">[</span><span class="n">iemi</span><span class="p">][</span><span class="n">statei</span><span class="p">]</span>
+                <span class="n">wfrf</span> <span class="o">=</span> <span class="n">WF_data</span><span class="p">[</span><span class="n">iwfdataf</span><span class="p">]</span><span class="o">.</span><span class="n">Ns</span><span class="p">[</span><span class="n">iemf</span><span class="p">][</span><span class="n">statef</span><span class="p">]</span><span class="o">*</span><span class="n">WF_data</span><span class="p">[</span><span class="n">iwfdataf</span><span class="p">]</span><span class="o">.</span><span class="n">wfrs</span><span class="p">[</span><span class="n">iemf</span><span class="p">][</span><span class="n">statef</span><span class="p">]</span>
+                <span class="n">kwfri</span> <span class="o">=</span> <span class="n">WF_data</span><span class="p">[</span><span class="n">iwfdatai</span><span class="p">]</span><span class="o">.</span><span class="n">Ns</span><span class="p">[</span><span class="n">iemi</span><span class="p">][</span><span class="n">statei</span><span class="p">]</span><span class="o">*</span><span class="n">WF_data</span><span class="p">[</span><span class="n">iwfdatai</span><span class="p">]</span><span class="o">.</span><span class="n">kwfrs</span><span class="p">[</span><span class="n">iemi</span><span class="p">][</span><span class="n">statei</span><span class="p">]</span>
+                <span class="n">kwfrf</span> <span class="o">=</span> <span class="n">WF_data</span><span class="p">[</span><span class="n">iwfdataf</span><span class="p">]</span><span class="o">.</span><span class="n">Ns</span><span class="p">[</span><span class="n">iemf</span><span class="p">][</span><span class="n">statef</span><span class="p">]</span><span class="o">*</span><span class="n">WF_data</span><span class="p">[</span><span class="n">iwfdataf</span><span class="p">]</span><span class="o">.</span><span class="n">kwfrs</span><span class="p">[</span><span class="n">iemf</span><span class="p">][</span><span class="n">statef</span><span class="p">]</span>
+                <span class="n">rgridwf</span> <span class="o">=</span>  <span class="n">WF_data</span><span class="p">[</span><span class="n">iwfdatai</span><span class="p">]</span><span class="o">.</span><span class="n">rgridwf</span><span class="p">[</span><span class="n">iemi</span><span class="p">]</span>
+                <span class="n">dV</span> <span class="o">=</span> <span class="p">(</span><span class="n">rgridwf</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span><span class="n">rgridwf</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="p">(</span><span class="n">rgridwf</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span><span class="n">rgridwf</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="p">(</span><span class="n">rgridwf</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span><span class="n">rgridwf</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span> 
+                
+                <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Wavefunctions found in WFdata. &quot;</span><span class="p">)</span>
+                
+                <span class="n">rgrids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">Rvects</span><span class="p">)</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">rgridwf</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>       
+                <span class="k">for</span> <span class="n">idir</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]:</span> <span class="c1">#x, y, z directions</span>
+                    <span class="k">for</span> <span class="n">i0</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">Rvects</span><span class="p">,</span> <span class="mi">1</span><span class="p">)):</span>
+                        <span class="k">for</span> <span class="n">i1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">Rvects</span><span class="p">,</span> <span class="mi">2</span><span class="p">)):</span>
+                            <span class="k">for</span> <span class="n">i2</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">Rvects</span><span class="p">,</span> <span class="mi">3</span><span class="p">)):</span>
+                                <span class="n">rgrids</span><span class="p">[</span><span class="n">idir</span><span class="p">,</span> <span class="n">i0</span><span class="p">,</span> <span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">]</span> <span class="o">=</span> <span class="n">Rvects</span><span class="p">[</span><span class="n">idir</span><span class="p">,</span> <span class="n">i0</span><span class="p">,</span> <span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">]</span><span class="o">+</span><span class="n">rgridwf</span><span class="p">[</span><span class="n">idir</span><span class="p">]</span>
+                            
+                
+                    
+                <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">Lmax</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                    <span class="n">Vdata</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">ems</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="n">trans</span><span class="p">][</span><span class="n">L</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="k">for</span> <span class="n">M</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">L</span><span class="p">,</span> <span class="n">L</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                        <span class="n">Vdata</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">ems</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="n">trans</span><span class="p">][</span><span class="n">L</span><span class="p">][</span><span class="n">M</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                        <span class="k">for</span> <span class="n">P</span> <span class="ow">in</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+                            <span class="n">Vdata</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">ems</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="n">trans</span><span class="p">][</span><span class="n">L</span><span class="p">][</span><span class="n">M</span><span class="p">][</span><span class="n">P</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">Nw</span><span class="p">)</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">Rvects</span><span class="p">)[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">dtype</span> <span class="o">=</span> <span class="nb">complex</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Calculating V for </span><span class="si">{</span><span class="n">L</span><span class="si">=}</span><span class="s2"> </span><span class="si">{</span><span class="n">M</span><span class="si">=}</span><span class="s2"> </span><span class="si">{</span><span class="n">P</span><span class="si">=}</span><span class="s2">. Dimension </span><span class="si">{</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">Nw</span><span class="p">)</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">Rvects</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                            
+                            <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Spectral response for </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">ks</span><span class="p">)</span><span class="si">}</span><span class="s2"> k-points for the photon&quot;</span><span class="p">)</span>
+                            <span class="k">for</span> <span class="n">ik</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ks</span><span class="p">):</span>
+
+                                <span class="n">Vdata</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">ems</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="n">trans</span><span class="p">][</span><span class="n">L</span><span class="p">][</span><span class="n">M</span><span class="p">][</span><span class="n">P</span><span class="p">][:,:,</span><span class="n">ik</span><span class="p">]</span> <span class="o">=</span> \
+                                    <span class="n">V12_par</span><span class="p">(</span><span class="n">wfri</span><span class="p">,</span> <span class="n">kwfri</span><span class="p">,</span> <span class="n">wfrf</span><span class="p">,</span> <span class="n">kwfrf</span><span class="p">,</span><span class="n">rgrids</span><span class="p">,</span><span class="n">k</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span>
+                                            <span class="n">nIndex</span><span class="p">,</span> <span class="n">Cgauge</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">Hint</span> <span class="o">=</span> <span class="n">Hint</span><span class="p">,</span> <span class="n">rshift</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
+                                            <span class="n">radtype</span> <span class="o">=</span> <span class="n">radtype_abs</span><span class="p">,</span> <span class="n">dV</span> <span class="o">=</span> <span class="n">dV</span><span class="p">,</span> <span class="n">parallel</span> <span class="o">=</span> <span class="n">parallel</span><span class="p">)</span>
+
+                    
+        <span class="c1">#If wavefunction does not exists:</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Wavefunction data does not exist for absorber- using known multipoles instead&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">trans</span> <span class="ow">in</span> <span class="n">absorber_transitions</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Now calculating for transition </span><span class="si">{</span><span class="n">trans</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">Vdata</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">ems</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="n">trans</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">Lmax</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                    <span class="n">Vdata</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">ems</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="n">trans</span><span class="p">][</span><span class="n">L</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="k">for</span> <span class="n">M</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">L</span><span class="p">,</span> <span class="n">L</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                        <span class="n">Vdata</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">ems</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="n">trans</span><span class="p">][</span><span class="n">L</span><span class="p">][</span><span class="n">M</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                        <span class="k">for</span> <span class="n">P</span> <span class="ow">in</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+                            <span class="n">Vdata</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">ems</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="n">trans</span><span class="p">][</span><span class="n">L</span><span class="p">][</span><span class="n">M</span><span class="p">][</span><span class="n">P</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">Nw</span><span class="p">)</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">Rvects</span><span class="p">)[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">dtype</span> <span class="o">=</span> <span class="nb">complex</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Calculating V for </span><span class="si">{</span><span class="n">L</span><span class="si">=}</span><span class="s2"> </span><span class="si">{</span><span class="n">M</span><span class="si">=}</span><span class="s2"> </span><span class="si">{</span><span class="n">P</span><span class="si">=}</span><span class="s2">. Dimension </span><span class="si">{</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">Nw</span><span class="p">)</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">Rvects</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                            
+                            <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Spectral response for </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">ks</span><span class="p">)</span><span class="si">}</span><span class="s2"> k-points for the photon&quot;</span><span class="p">)</span>
+                            <span class="k">for</span> <span class="n">ik</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ks</span><span class="p">):</span>
+
+
+                                <span class="k">if</span> <span class="s2">&quot;ED&quot;</span> <span class="ow">in</span> <span class="n">trans</span><span class="p">:</span>
+                                    <span class="n">Vdata</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">ems</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="n">trans</span><span class="p">][</span><span class="n">L</span><span class="p">][</span><span class="n">M</span><span class="p">][</span><span class="n">P</span><span class="p">][:,:,</span><span class="n">ik</span><span class="p">]</span> <span class="o">=</span> \
+                                        <span class="n">V12_ED</span><span class="p">(</span><span class="n">Em_data</span><span class="o">.</span><span class="n">pMPs</span><span class="p">[</span><span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">trans</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">Rvects</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span><span class="n">nIndex</span><span class="p">,</span> <span class="n">radtype_abs</span><span class="p">,</span> <span class="n">Cgauge</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+                                <span class="k">else</span><span class="p">:</span>
+                                    <span class="n">Vdata</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">ems</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="n">trans</span><span class="p">][</span><span class="n">L</span><span class="p">][</span><span class="n">M</span><span class="p">][</span><span class="n">P</span><span class="p">][:,:,</span><span class="n">ik</span><span class="p">]</span> <span class="o">=</span> \
+                                        <span class="n">V12_MD</span><span class="p">(</span><span class="n">Em_data</span><span class="o">.</span><span class="n">pMPs</span><span class="p">[</span><span class="n">ems</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">trans</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">Rvects</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span><span class="n">nIndex</span><span class="p">,</span> <span class="n">radtype_abs</span><span class="p">,</span> <span class="n">Cgauge</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+
+    
+    
+    <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Vdata</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+    
+<span class="c1">############################################</span>
+<span class="c1"># Methods to compute matrix elements     ##</span>
+<span class="c1">############################################</span>
+<div class="viewcode-block" id="V12">
+<a class="viewcode-back" href="../../documentation.html#pyRET.Vtools.V12">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">V12</span><span class="p">(</span>
+        <span class="n">wfr1</span><span class="p">,</span>
+        <span class="n">kwfr1</span><span class="p">,</span>
+        <span class="n">wfr2</span><span class="p">,</span>
+        <span class="n">kwfr2</span><span class="p">,</span>
+        <span class="n">rgrids</span><span class="p">,</span>
+        <span class="n">k</span><span class="p">,</span>
+        <span class="n">L</span><span class="p">,</span>
+        <span class="n">M</span><span class="p">,</span>
+        <span class="n">P</span><span class="p">,</span>
+        <span class="n">nIndex</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span>
+        <span class="n">Cgauge</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">Hint</span> <span class="o">=</span> <span class="s2">&quot;Adotp&quot;</span><span class="p">,</span>
+        <span class="n">rshift</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
+        <span class="n">radtype</span> <span class="o">=</span> <span class="s2">&quot;J&quot;</span><span class="p">,</span>
+        <span class="n">dV</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">etaeff</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span>
+        <span class="p">):</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the matrix elements with specific positions and wavefunctions. This is the core function that computes the V matrix elements for a given set of wavefunctions, multipole parameters, and positions. It can compute the matrix elements for both the &quot;Adotp&quot; and &quot;Edotr&quot; interaction Hamiltonians, and it can also handle different gauges and radial function types. The computed matrix elements are returned as a 2x2 matrix corresponding to the different spin configurations.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        wfr1 (numpy array of shape (N, N, N)): Wavefunction of the initial state</span>
+<span class="sd">        kwfr1 (numpy array of shape (3, N, N, N)): Gradient of the wavefunction of the initial state</span>
+<span class="sd">        wfr2 (numpy array of shape (N, N, N)): Wavefunction of the final state</span>
+<span class="sd">        kwfr2 (numpy array of shape (3, N, N, N)): Gradient of the wavefunction of the final state</span>
+<span class="sd">        rgrids (numpy array of shape (3,n1,n2,..nM, N, N, N)): Radial grid for the computation of the matrix elements</span>
+<span class="sd">        k (float): Wavevector of the emitted photon</span>
+<span class="sd">        L (int): Orbital angular momentum</span>
+<span class="sd">        M (int): projected total angular momentum</span>
+<span class="sd">        P (int): Parity of the multipole</span>
+<span class="sd">        nIndex (float): Refractive index of the medium. Defaults to 1.</span>
+<span class="sd">        Cgauge (int): Gauge parameter. 0 for Coulomb gauge.</span>
+<span class="sd">        Hint (str): Type of interaction Hamiltonian to use. Options are &quot;Adotp&quot; or &quot;Edotr&quot;. Defaults to &quot;Adotp&quot;.</span>
+<span class="sd">        rshift (numpy array of shape (3,)): Additional shift in position. Optional.</span>
+<span class="sd">        radtype (str): Type of radial function to use. Options are &quot;J&quot; for Bessel functions and &quot;H1&quot; for Hankel functions. Defaults to &quot;J&quot;.</span>
+<span class="sd">        dV (float): Volume element for the integration. If None, it will be computed from the rgrids. Defaults to None.</span>
+<span class="sd">        etaeff (float): Effective mass of electron in the Pauli-Fierz hamiltonian normalized to the free electron mass.    </span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        V12 (numpy array of shape (2, 2, n1, n2, ... nM)): matrix elements. The first two dimensions correspond to the spin configurations (spin flip tag on initial and final states), and the remaining dimensions correspond to the spatial grid defined by rgrids.</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1">#First, determine the dimension of rgrid:</span>
+    <span class="n">Ndim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">rgrids</span><span class="p">))</span>
+    <span class="n">Ndimwf</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">wfr1</span><span class="p">))</span>
+    
+    <span class="n">Ndimextra</span> <span class="o">=</span> <span class="n">Ndim</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="n">Ndimwf</span>
+    <span class="n">shape</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">rgrids</span><span class="p">))</span>
+    <span class="n">outshape</span> <span class="o">=</span> <span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">Ndim</span><span class="o">-</span><span class="n">Ndimwf</span><span class="p">):</span>
+        <span class="n">outshape</span><span class="o">+=</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="n">i</span><span class="p">],)</span>
+    <span class="c1">#print(f&quot;Computing V {Ndim=} {Ndimwf=} {outshape = }&quot;)</span>
+    
+    
+    <span class="c1">#Defining the constants:</span>
+    <span class="n">consts</span> <span class="o">=</span> <span class="n">Consts</span><span class="p">()</span>
+    <span class="n">mu0</span> <span class="o">=</span> <span class="n">consts</span><span class="o">.</span><span class="n">mu0</span>
+    <span class="n">eps0</span> <span class="o">=</span> <span class="n">consts</span><span class="o">.</span><span class="n">eps0</span>
+    <span class="n">lam</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">nIndex</span><span class="o">/</span><span class="n">k</span>
+    <span class="n">omega</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">consts</span><span class="o">.</span><span class="n">c</span><span class="o">/</span><span class="n">lam</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">consts</span><span class="o">.</span><span class="n">qe</span>
+    <span class="n">hbar</span><span class="o">=</span> <span class="n">consts</span><span class="o">.</span><span class="n">hplank</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+    <span class="n">hplank</span> <span class="o">=</span> <span class="n">consts</span><span class="o">.</span><span class="n">hplank</span>
+    <span class="n">me</span> <span class="o">=</span> <span class="n">consts</span><span class="o">.</span><span class="n">me</span><span class="o">*</span><span class="n">etaeff</span>
+    <span class="n">muB</span> <span class="o">=</span> <span class="n">e</span><span class="o">*</span><span class="n">consts</span><span class="o">.</span><span class="n">hbar</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">me</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">dV</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1">#Volume element:</span>
+        <span class="k">if</span> <span class="n">Ndimextra</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">dV</span> <span class="o">=</span> <span class="p">(</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="p">(</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="p">(</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span> 
+        <span class="k">elif</span> <span class="n">Ndimextra</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">dV</span> <span class="o">=</span> <span class="p">(</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="p">(</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="p">(</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">Ndimextra</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">dV</span> <span class="o">=</span> <span class="p">(</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="p">(</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="p">(</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">Ndimextra</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">dV</span> <span class="o">=</span> <span class="p">(</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="p">(</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="p">(</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Number of auxiliary dimension out of bounds. Max 3 allowed.&quot;</span><span class="p">)</span>
+        
+    <span class="n">V12</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="o">+</span> <span class="n">outshape</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="nb">complex</span><span class="p">)</span> 
+
+    <span class="k">if</span> <span class="n">Hint</span> <span class="o">==</span>  <span class="s2">&quot;Adotp&quot;</span><span class="p">:</span>
+        
+        <span class="c1">#Initialize the multipole:</span>
+        <span class="n">A</span><span class="p">,</span> <span class="n">A0</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">H</span> <span class="o">=</span> <span class="n">InitializeMultipole</span><span class="p">([</span><span class="n">L</span><span class="p">],</span> <span class="p">[</span><span class="n">M</span><span class="p">],</span> <span class="p">[</span><span class="n">P</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.</span><span class="p">],</span> <span class="n">lam</span> <span class="p">,</span> <span class="n">nIndex</span><span class="p">,</span> <span class="n">L</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">Cgauge</span><span class="p">,</span> <span class="n">radtype</span><span class="o">=</span><span class="n">radtype</span><span class="p">)</span>
+        <span class="c1">#Fields computed over the radial grid provided as argument</span>
+        <span class="c1">#print(np.shape(rgrids))</span>
+        <span class="n">Ar</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">torgrid</span><span class="p">(</span><span class="n">rgrids</span><span class="p">)</span>
+        <span class="n">A0r</span> <span class="o">=</span> <span class="n">A0</span><span class="o">.</span><span class="n">torgrid</span><span class="p">(</span><span class="n">rgrids</span><span class="p">)</span>
+        <span class="n">Hr</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">torgrid</span><span class="p">(</span><span class="n">rgrids</span><span class="p">)</span>
+        <span class="n">divAr</span> <span class="o">=</span> <span class="n">divergence</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="o">.</span><span class="n">torgrid</span><span class="p">(</span><span class="n">rgrids</span><span class="p">)</span>
+
+
+        <span class="c1">#Spin conserving components</span>
+        <span class="n">adotkpsi</span> <span class="o">=</span> <span class="p">(</span><span class="n">Ar</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">kwfr1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">Ar</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">kwfr1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">Ar</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">kwfr1</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">v12</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">muB</span> <span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">wfr2</span><span class="p">)</span><span class="o">*</span><span class="n">wfr1</span><span class="o">*</span><span class="n">divAr</span><span class="o">*</span><span class="n">dV</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">))</span> \
+                    <span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">muB</span> <span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">wfr2</span><span class="p">)</span><span class="o">*</span><span class="n">adotkpsi</span><span class="o">*</span><span class="n">dV</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">))</span>
+
+        <span class="n">s12</span> <span class="o">=</span> <span class="o">-</span><span class="n">e</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">wfr2</span><span class="p">)</span><span class="o">*</span><span class="n">wfr1</span><span class="o">*</span><span class="n">A0r</span><span class="o">*</span><span class="n">dV</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">))</span>
+
+        <span class="c1">#Spin flip components:</span>
+        <span class="n">b00</span> <span class="o">=</span> <span class="n">muB</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">wfr2</span><span class="p">)</span><span class="o">*</span><span class="n">mu0</span> <span class="o">*</span> <span class="n">Hr</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span><span class="n">wfr1</span><span class="o">*</span><span class="n">dV</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">))</span>
+        <span class="n">b01</span> <span class="o">=</span> <span class="n">muB</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">wfr2</span><span class="p">)</span><span class="o">*</span><span class="n">mu0</span> <span class="o">*</span> <span class="p">(</span><span class="n">Hr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">Hr</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span><span class="n">wfr1</span><span class="o">*</span><span class="n">dV</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">))</span>
+        <span class="n">b10</span> <span class="o">=</span> <span class="n">muB</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">wfr2</span><span class="p">)</span><span class="o">*</span><span class="n">mu0</span> <span class="o">*</span> <span class="p">(</span><span class="n">Hr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">Hr</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span><span class="n">wfr1</span><span class="o">*</span><span class="n">dV</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">))</span>
+
+        <span class="n">V12</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">v12</span><span class="o">+</span><span class="n">s12</span><span class="o">+</span><span class="n">b00</span>
+        <span class="n">V12</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">v12</span><span class="o">+</span><span class="n">s12</span><span class="o">-</span><span class="n">b00</span>
+        <span class="n">V12</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">b01</span>
+        <span class="n">V12</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">b10</span>
+
+        <span class="k">return</span> <span class="n">V12</span>
+
+    <span class="k">elif</span> <span class="n">Hint</span> <span class="o">==</span> <span class="s2">&quot;Edotr&quot;</span><span class="p">:</span>
+        
+        <span class="c1">#Initialize the multipole:</span>
+        <span class="n">A</span><span class="p">,</span> <span class="n">A0</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">H</span> <span class="o">=</span> <span class="n">InitializeMultipole</span><span class="p">([</span><span class="n">L</span><span class="p">],</span> <span class="p">[</span><span class="n">M</span><span class="p">],</span> <span class="p">[</span><span class="n">P</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.</span><span class="p">],</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">nIndex</span><span class="o">/</span><span class="n">k</span> <span class="p">,</span> <span class="n">nIndex</span><span class="p">,</span> <span class="n">L</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">Cgauge</span><span class="p">,</span> <span class="n">radtype</span><span class="o">=</span><span class="n">radtype</span><span class="p">)</span>
+        <span class="c1">#Fields computed over the radial grid provided as argument</span>
+        <span class="c1">#Ar = A.torgrid(rgrid)</span>
+        <span class="c1">#A0r = A0.torgrid(rgrid)</span>
+        <span class="n">Er</span> <span class="o">=</span> <span class="n">E</span><span class="o">.</span><span class="n">torgrid</span><span class="p">(</span><span class="n">rgrids</span><span class="p">)</span>
+        <span class="n">Hr</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">torgrid</span><span class="p">(</span><span class="n">rgrids</span><span class="p">)</span>
+        <span class="c1">#divAr = divergence(A).torgrid(rgrid)</span>
+        
+        <span class="c1">#Spin conserving components</span>
+        <span class="n">Edotr</span> <span class="o">=</span> <span class="p">(</span><span class="n">Er</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">Er</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">Er</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>\
+            <span class="o">+</span><span class="p">(</span><span class="n">Er</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">rshift</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">Er</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">rshift</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">Er</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">rshift</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> 
+
+        <span class="n">e12</span> <span class="o">=</span> <span class="n">e</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">wfr2</span><span class="p">)</span><span class="o">*</span><span class="n">wfr1</span><span class="o">*</span><span class="n">Edotr</span><span class="o">*</span><span class="n">dV</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">))</span>
+        
+        <span class="c1">#Spin flip components:</span>
+        <span class="n">b00</span> <span class="o">=</span> <span class="n">muB</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">wfr2</span><span class="p">)</span><span class="o">*</span><span class="n">mu0</span> <span class="o">*</span> <span class="n">Hr</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span><span class="n">wfr1</span><span class="o">*</span><span class="n">dV</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">))</span>
+        <span class="n">b01</span> <span class="o">=</span> <span class="n">muB</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">wfr2</span><span class="p">)</span><span class="o">*</span><span class="n">mu0</span> <span class="o">*</span> <span class="p">(</span><span class="n">Hr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">Hr</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span><span class="n">wfr1</span><span class="o">*</span><span class="n">dV</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">))</span>
+        <span class="n">b10</span> <span class="o">=</span> <span class="n">muB</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">wfr2</span><span class="p">)</span><span class="o">*</span><span class="n">mu0</span> <span class="o">*</span> <span class="p">(</span><span class="n">Hr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">Hr</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span><span class="n">wfr1</span><span class="o">*</span><span class="n">dV</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">))</span>
+        
+        <span class="n">V12</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">e12</span><span class="o">+</span><span class="n">b00</span>
+        <span class="n">V12</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">e12</span><span class="o">-</span><span class="n">b00</span>
+        <span class="n">V12</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">b01</span>
+        <span class="n">V12</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">b10</span>
+
+        <span class="k">return</span> <span class="n">V12</span>
+        
+    <span class="k">return</span></div>
+
+
+<div class="viewcode-block" id="V12_par">
+<a class="viewcode-back" href="../../documentation.html#pyRET.Vtools.V12_par">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">V12_par</span><span class="p">(</span>
+        <span class="n">wfr1</span><span class="p">,</span>
+        <span class="n">kwfr1</span><span class="p">,</span>
+        <span class="n">wfr2</span><span class="p">,</span>
+        <span class="n">kwfr2</span><span class="p">,</span>
+        <span class="n">rgrids</span><span class="p">,</span>
+        <span class="n">k</span><span class="p">,</span>
+        <span class="n">L</span><span class="p">,</span>
+        <span class="n">M</span><span class="p">,</span>
+        <span class="n">P</span><span class="p">,</span>
+        <span class="n">nIndex</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span>
+        <span class="n">Cgauge</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">Hint</span> <span class="o">=</span> <span class="s2">&quot;Adotp&quot;</span><span class="p">,</span>
+        <span class="n">rshift</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
+        <span class="n">radtype</span> <span class="o">=</span> <span class="s2">&quot;J&quot;</span><span class="p">,</span>
+        <span class="n">dV</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">etaeff</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span>
+        <span class="n">parallel</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="p">):</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parallely computes, using mpi4py, the matrix elements with specific positions and wavefunctions. This is the core function that computes the V matrix elements for a given set of wavefunctions, multipole parameters, and positions. It can compute the matrix elements for both the &quot;Adotp&quot; and &quot;Edotr&quot; interaction Hamiltonians, and it can also handle different gauges and radial function types. The computed matrix elements are returned as a 2x2 matrix corresponding to the different spin configurations. This function also supports serial implementation if parallel flag is set to False.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        wfr1 (numpy array of shape (N, N, N)): Wavefunction of the initial state</span>
+<span class="sd">        kwfr1 (numpy array of shape (3, N, N, N)): Gradient of the wavefunction of the initial state</span>
+<span class="sd">        wfr2 (numpy array of shape (N, N, N)): Wavefunction of the final state</span>
+<span class="sd">        kwfr2 (numpy array of shape (3, N, N, N)): Gradient of the wavefunction of the final state</span>
+<span class="sd">        rgrids (numpy array of shape (3,n1,n2,..nM, N, N, N)): Radial grid for the computation of the matrix elements</span>
+<span class="sd">        k (float): Wavevector of the emitted photon</span>
+<span class="sd">        L (int): Orbital angular momentum</span>
+<span class="sd">        M (int): projected total angular momentum</span>
+<span class="sd">        P (int): Parity of the multipole</span>
+<span class="sd">        nIndex (float): Refractive index of the medium. Defaults to 1.</span>
+<span class="sd">        Cgauge (int): Gauge parameter. 0 for Coulomb gauge.</span>
+<span class="sd">        Hint (str): Type of interaction Hamiltonian to use. Options are &quot;Adotp&quot; or &quot;Edotr&quot;. Defaults to &quot;Adotp&quot;.</span>
+<span class="sd">        rshift (numpy array of shape (3,)): Additional shift in position. Optional.</span>
+<span class="sd">        radtype (str): Type of radial function to use. Options are &quot;J&quot; for Bessel functions and &quot;H1&quot; for Hankel functions. Defaults to &quot;J&quot;.</span>
+<span class="sd">        dV (float): Volume element for the integration. If None, it will be computed from the rgrids. Defaults to None.</span>
+<span class="sd">        etaeff (float): Effective mass of electron in the Pauli-Fierz hamiltonian normalized to the free electron mass.    </span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        V12 (numpy array of shape (2, 2, n1, n2, ... nM)): matrix elements. The first two dimensions correspond to the spin configurations (spin flip tag on initial and final states), and the remaining dimensions correspond to the spatial grid defined by rgrids.</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+
+    <span class="k">if</span> <span class="n">parallel</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">mpi4py</span><span class="w"> </span><span class="kn">import</span> <span class="n">MPI</span>  
+        <span class="n">comm</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span>
+        <span class="n">rank</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">Get_size</span><span class="p">()</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">Wtime</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">rank</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    
+    
+    <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2"> Calculating V with parallel processing: </span><span class="si">{</span><span class="n">size</span><span class="si">}</span><span class="s2"> Workers&quot;</span><span class="p">)</span>
+    
+    
+    <span class="c1">#First, determine the dimension of rgrid:</span>
+    <span class="n">Ndim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">rgrids</span><span class="p">))</span>
+    <span class="n">Ndimwf</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">wfr1</span><span class="p">))</span>
+    
+    <span class="n">Ndimextra</span> <span class="o">=</span> <span class="n">Ndim</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="n">Ndimwf</span>
+    <span class="n">shape</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">rgrids</span><span class="p">))</span>
+    <span class="n">outshape</span> <span class="o">=</span> <span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">Ndim</span><span class="o">-</span><span class="n">Ndimwf</span><span class="p">):</span>
+        <span class="n">outshape</span><span class="o">+=</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="n">i</span><span class="p">],)</span>
+    <span class="k">if</span> <span class="n">rank</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Computing V </span><span class="si">{</span><span class="n">Ndim</span><span class="si">=}</span><span class="s2"> </span><span class="si">{</span><span class="n">Ndimwf</span><span class="si">=}</span><span class="s2"> </span><span class="si">{</span><span class="n">outshape</span><span class="w"> </span><span class="si">= }</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    
+    <span class="c1">#Defining the constants:</span>
+    <span class="n">consts</span> <span class="o">=</span> <span class="n">Consts</span><span class="p">()</span>
+    <span class="n">mu0</span> <span class="o">=</span> <span class="n">consts</span><span class="o">.</span><span class="n">mu0</span>
+    <span class="n">eps0</span> <span class="o">=</span> <span class="n">consts</span><span class="o">.</span><span class="n">eps0</span>
+    <span class="n">lam</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">nIndex</span><span class="o">/</span><span class="n">k</span>
+    <span class="n">omega</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">consts</span><span class="o">.</span><span class="n">c</span><span class="o">/</span><span class="n">lam</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">consts</span><span class="o">.</span><span class="n">qe</span>
+    <span class="n">hbar</span><span class="o">=</span> <span class="n">consts</span><span class="o">.</span><span class="n">hplank</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+    <span class="n">hplank</span> <span class="o">=</span> <span class="n">consts</span><span class="o">.</span><span class="n">hplank</span>
+    <span class="n">me</span> <span class="o">=</span> <span class="n">consts</span><span class="o">.</span><span class="n">me</span><span class="o">*</span><span class="n">etaeff</span>
+    <span class="n">muB</span> <span class="o">=</span> <span class="n">e</span><span class="o">*</span><span class="n">consts</span><span class="o">.</span><span class="n">hbar</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">me</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">dV</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1">#Volume element:</span>
+        <span class="k">if</span> <span class="n">Ndimextra</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">dV</span> <span class="o">=</span> <span class="p">(</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="p">(</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="p">(</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span> 
+        <span class="k">elif</span> <span class="n">Ndimextra</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">dV</span> <span class="o">=</span> <span class="p">(</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="p">(</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="p">(</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">Ndimextra</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">dV</span> <span class="o">=</span> <span class="p">(</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="p">(</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="p">(</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">Ndimextra</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">dV</span> <span class="o">=</span> <span class="p">(</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="p">(</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="p">(</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Number of auxiliary dimension out of bounds. Max 3 allowed.&quot;</span><span class="p">)</span>
+    
+    
+    <span class="n">V12</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="o">+</span> <span class="n">outshape</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="nb">complex</span><span class="p">)</span> 
+
+    <span class="k">if</span> <span class="n">Hint</span> <span class="o">==</span>  <span class="s2">&quot;Adotp&quot;</span><span class="p">:</span>
+        
+        <span class="c1">#Initialize the multipole:</span>
+        <span class="n">A</span><span class="p">,</span> <span class="n">A0</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">H</span> <span class="o">=</span> <span class="n">InitializeMultipole</span><span class="p">([</span><span class="n">L</span><span class="p">],</span> <span class="p">[</span><span class="n">M</span><span class="p">],</span> <span class="p">[</span><span class="n">P</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.</span><span class="p">],</span> <span class="n">lam</span> <span class="p">,</span> <span class="n">nIndex</span><span class="p">,</span> <span class="n">L</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">Cgauge</span><span class="p">,</span> <span class="n">radtype</span><span class="o">=</span><span class="n">radtype</span><span class="p">)</span>
+        <span class="c1">#Fields computed over the radial grid provided as argument</span>
+        <span class="c1">#print(np.shape(rgrids))</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Ar = A.torgrid(rgrids)</span>
+<span class="sd">        A0r = A0.torgrid(rgrids)</span>
+<span class="sd">        Hr = H.torgrid(rgrids)</span>
+<span class="sd">        divAr = divergence(A).torgrid(rgrids)&quot;&quot;&quot;</span>
+
+
+        <span class="c1">#Spin conserving components</span>
+        <span class="k">if</span> <span class="n">parallel</span><span class="p">:</span>
+            <span class="n">comm</span><span class="o">.</span><span class="n">Barrier</span><span class="p">()</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="n">dot_n_SF_par</span><span class="p">(</span><span class="n">rgrids</span><span class="p">,</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">wfr2</span><span class="p">),</span> <span class="n">wfr1</span><span class="p">],</span> <span class="n">divergence</span><span class="p">(</span><span class="n">A</span><span class="p">),</span> <span class="n">parallel</span> <span class="o">=</span> <span class="n">parallel</span><span class="p">)</span>
+        <span class="n">v12_0</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">muB</span> <span class="o">*</span><span class="n">dV</span> <span class="o">*</span> <span class="n">temp</span> <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
+        
+        <span class="k">if</span> <span class="n">parallel</span><span class="p">:</span>
+            <span class="n">comm</span><span class="o">.</span><span class="n">Barrier</span><span class="p">()</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="n">dot_n_VF_par</span><span class="p">(</span><span class="n">rgrids</span><span class="p">,[</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">wfr2</span><span class="p">),</span><span class="n">kwfr1</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">A</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">parallel</span> <span class="o">=</span> <span class="n">parallel</span><span class="p">)</span>
+        <span class="n">v12_1</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">muB</span>  <span class="o">*</span><span class="n">dV</span> <span class="o">*</span> <span class="n">temp</span> <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span> 
+        
+        <span class="k">if</span> <span class="n">parallel</span><span class="p">:</span>
+            <span class="n">comm</span><span class="o">.</span><span class="n">Barrier</span><span class="p">()</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="n">dot_n_VF_par</span><span class="p">(</span><span class="n">rgrids</span><span class="p">,[</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">wfr2</span><span class="p">),</span><span class="n">kwfr1</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">A</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>  <span class="n">parallel</span> <span class="o">=</span> <span class="n">parallel</span><span class="p">)</span>
+        <span class="n">v12_2</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">muB</span>  <span class="o">*</span><span class="n">dV</span> <span class="o">*</span> <span class="n">temp</span> <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span> 
+        
+        <span class="k">if</span> <span class="n">parallel</span><span class="p">:</span>
+            <span class="n">comm</span><span class="o">.</span><span class="n">Barrier</span><span class="p">()</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="n">dot_n_VF_par</span><span class="p">(</span><span class="n">rgrids</span><span class="p">,[</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">wfr2</span><span class="p">),</span><span class="n">kwfr1</span><span class="p">[</span><span class="mi">2</span><span class="p">]],</span> <span class="n">A</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">parallel</span> <span class="o">=</span> <span class="n">parallel</span><span class="p">)</span>
+        <span class="n">v12_3</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">muB</span>  <span class="o">*</span><span class="n">dV</span> <span class="o">*</span> <span class="n">temp</span> <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>  
+        
+        <span class="k">if</span> <span class="n">parallel</span><span class="p">:</span>
+            <span class="n">comm</span><span class="o">.</span><span class="n">Barrier</span><span class="p">()</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="n">dot_n_SF_par</span><span class="p">(</span><span class="n">rgrids</span><span class="p">,[</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">wfr2</span><span class="p">),</span><span class="n">wfr1</span><span class="p">],</span> <span class="n">A0</span><span class="p">,</span> <span class="n">parallel</span> <span class="o">=</span> <span class="n">parallel</span><span class="p">)</span>
+        <span class="n">s12</span> <span class="o">=</span> <span class="o">-</span><span class="n">e</span><span class="o">*</span><span class="n">dV</span><span class="o">*</span> <span class="n">temp</span> <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
+        
+
+        <span class="c1">#Spin flip components:</span>
+        <span class="k">if</span> <span class="n">parallel</span><span class="p">:</span>
+            <span class="n">comm</span><span class="o">.</span><span class="n">Barrier</span><span class="p">()</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="n">dot_n_VF_par</span><span class="p">(</span><span class="n">rgrids</span><span class="p">,[</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">wfr2</span><span class="p">),</span><span class="n">wfr1</span><span class="p">],</span> <span class="n">H</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">parallel</span> <span class="o">=</span> <span class="n">parallel</span><span class="p">)</span> 
+        <span class="n">b00</span> <span class="o">=</span> <span class="n">muB</span><span class="o">*</span><span class="n">dV</span><span class="o">*</span><span class="n">mu0</span><span class="o">*</span> <span class="n">temp</span> <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
+        
+        <span class="k">if</span> <span class="n">parallel</span><span class="p">:</span>
+            <span class="n">comm</span><span class="o">.</span><span class="n">Barrier</span><span class="p">()</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="n">dot_n_VF_par</span><span class="p">(</span><span class="n">rgrids</span><span class="p">,[</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">wfr2</span><span class="p">),</span><span class="n">wfr1</span><span class="p">],</span> <span class="n">H</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">parallel</span> <span class="o">=</span> <span class="n">parallel</span><span class="p">)</span>
+        <span class="n">temp1</span> <span class="o">=</span> <span class="n">dot_n_VF_par</span><span class="p">(</span><span class="n">rgrids</span><span class="p">,[</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">wfr2</span><span class="p">),</span><span class="n">wfr1</span><span class="p">],</span> <span class="n">H</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">parallel</span> <span class="o">=</span> <span class="n">parallel</span><span class="p">)</span>
+        <span class="n">b01</span> <span class="o">=</span> <span class="n">muB</span><span class="o">*</span><span class="n">dV</span><span class="o">*</span><span class="n">mu0</span><span class="o">*</span> <span class="p">(</span><span class="n">temp</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">temp1</span><span class="p">)</span> <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">b10</span> <span class="o">=</span> <span class="n">muB</span><span class="o">*</span><span class="n">dV</span><span class="o">*</span><span class="n">mu0</span><span class="o">*</span> <span class="p">(</span><span class="n">temp</span> <span class="o">-</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">temp1</span><span class="p">)</span> <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
+        
+        <span class="k">if</span> <span class="n">parallel</span><span class="p">:</span>
+            <span class="n">comm</span><span class="o">.</span><span class="n">Barrier</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+
+            <span class="n">V12</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">v12_0</span><span class="o">+</span><span class="n">v12_1</span><span class="o">+</span><span class="n">v12_2</span><span class="o">+</span><span class="n">v12_3</span><span class="o">+</span><span class="n">s12</span><span class="o">+</span><span class="n">b00</span>
+            <span class="n">V12</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">v12_0</span><span class="o">+</span><span class="n">v12_1</span><span class="o">+</span><span class="n">v12_2</span><span class="o">+</span><span class="n">v12_3</span><span class="o">+</span><span class="n">s12</span><span class="o">-</span><span class="n">b00</span>
+            <span class="n">V12</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">b01</span>
+            <span class="n">V12</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">b10</span>
+
+            <span class="k">return</span> <span class="n">V12</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        
+    <span class="k">elif</span> <span class="n">Hint</span> <span class="o">==</span> <span class="s2">&quot;Edotr&quot;</span><span class="p">:</span>
+        
+        <span class="c1">#Initialize the multipole:</span>
+        <span class="n">A</span><span class="p">,</span> <span class="n">A0</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">H</span> <span class="o">=</span> <span class="n">InitializeMultipole</span><span class="p">([</span><span class="n">L</span><span class="p">],</span> <span class="p">[</span><span class="n">M</span><span class="p">],</span> <span class="p">[</span><span class="n">P</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.</span><span class="p">],</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">nIndex</span><span class="o">/</span><span class="n">k</span> <span class="p">,</span> <span class="n">nIndex</span><span class="p">,</span> <span class="n">L</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">Cgauge</span><span class="p">,</span> <span class="n">radtype</span><span class="o">=</span><span class="n">radtype</span><span class="p">)</span>
+        <span class="c1">#Fields computed over the radial grid provided as argument</span>
+        <span class="c1">#Ar = A.torgrid(rgrid)</span>
+        <span class="c1">#A0r = A0.torgrid(rgrid)</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Er = E.torgrid(rgrids)</span>
+<span class="sd">        Hr = H.torgrid(rgrids)&quot;&quot;&quot;</span>
+        <span class="c1">#divAr = divergence(A).torgrid(rgrid)</span>
+        
+        <span class="c1">#Spin conserving components</span>
+        <span class="k">if</span> <span class="n">parallel</span><span class="p">:</span>
+            <span class="n">comm</span><span class="o">.</span><span class="n">Barrier</span><span class="p">()</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="n">dot_n_VF_par</span><span class="p">(</span><span class="n">rgrids</span><span class="p">,[</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">wfr2</span><span class="p">),</span><span class="n">wfr1</span><span class="p">,</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">rshift</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span><span class="n">E</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">parallel</span> <span class="o">=</span> <span class="n">parallel</span><span class="p">)</span>
+        <span class="n">e12_0</span> <span class="o">=</span><span class="n">e</span><span class="o">*</span><span class="n">dV</span><span class="o">*</span><span class="n">temp</span> <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
+        
+        <span class="k">if</span> <span class="n">parallel</span><span class="p">:</span>
+            <span class="n">comm</span><span class="o">.</span><span class="n">Barrier</span><span class="p">()</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="n">dot_n_VF_par</span><span class="p">(</span><span class="n">rgrids</span><span class="p">,[</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">wfr2</span><span class="p">),</span><span class="n">wfr1</span><span class="p">,</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">rshift</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span><span class="n">E</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">parallel</span> <span class="o">=</span> <span class="n">parallel</span><span class="p">)</span>
+        <span class="n">e12_1</span> <span class="o">=</span><span class="n">e</span><span class="o">*</span><span class="n">dV</span><span class="o">*</span><span class="n">temp</span> <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
+        
+        <span class="k">if</span> <span class="n">parallel</span><span class="p">:</span>
+            <span class="n">comm</span><span class="o">.</span><span class="n">Barrier</span><span class="p">()</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="n">dot_n_VF_par</span><span class="p">(</span><span class="n">rgrids</span><span class="p">,[</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">wfr2</span><span class="p">),</span><span class="n">wfr1</span><span class="p">,</span><span class="n">rgrids</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">+</span><span class="n">rshift</span><span class="p">[</span><span class="mi">2</span><span class="p">]],</span><span class="n">E</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">parallel</span> <span class="o">=</span> <span class="n">parallel</span><span class="p">)</span>
+        <span class="n">e12_2</span> <span class="o">=</span><span class="n">e</span><span class="o">*</span><span class="n">dV</span><span class="o">*</span><span class="n">temp</span> <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
+        
+        
+        
+        
+        
+        <span class="c1">#Spin flip components:</span>
+        <span class="k">if</span> <span class="n">parallel</span><span class="p">:</span>
+            <span class="n">comm</span><span class="o">.</span><span class="n">Barrier</span><span class="p">()</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="n">dot_n_VF_par</span><span class="p">(</span><span class="n">rgrids</span><span class="p">,[</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">wfr2</span><span class="p">),</span><span class="n">wfr1</span><span class="p">],</span> <span class="n">H</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">parallel</span> <span class="o">=</span> <span class="n">parallel</span><span class="p">)</span> 
+        <span class="n">b00</span> <span class="o">=</span> <span class="n">muB</span><span class="o">*</span><span class="n">dV</span><span class="o">*</span><span class="n">mu0</span><span class="o">*</span> <span class="n">temp</span> <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
+        
+        <span class="k">if</span> <span class="n">parallel</span><span class="p">:</span>
+            <span class="n">comm</span><span class="o">.</span><span class="n">Barrier</span><span class="p">()</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="n">dot_n_VF_par</span><span class="p">(</span><span class="n">rgrids</span><span class="p">,[</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">wfr2</span><span class="p">),</span><span class="n">wfr1</span><span class="p">],</span> <span class="n">H</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">parallel</span> <span class="o">=</span> <span class="n">parallel</span><span class="p">)</span>
+        <span class="n">temp1</span> <span class="o">=</span> <span class="n">dot_n_VF_par</span><span class="p">(</span><span class="n">rgrids</span><span class="p">,[</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">wfr2</span><span class="p">),</span><span class="n">wfr1</span><span class="p">],</span> <span class="n">H</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">parallel</span> <span class="o">=</span> <span class="n">parallel</span><span class="p">)</span>
+        <span class="n">b01</span> <span class="o">=</span> <span class="n">muB</span><span class="o">*</span><span class="n">dV</span><span class="o">*</span><span class="n">mu0</span><span class="o">*</span> <span class="p">(</span><span class="n">temp</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">temp1</span><span class="p">)</span> <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">b10</span> <span class="o">=</span> <span class="n">muB</span><span class="o">*</span><span class="n">dV</span><span class="o">*</span><span class="n">mu0</span><span class="o">*</span> <span class="p">(</span><span class="n">temp</span> <span class="o">-</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">temp1</span><span class="p">)</span> <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
+        
+        
+        <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">V12</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">e12_0</span><span class="o">+</span><span class="n">e12_1</span><span class="o">+</span><span class="n">e12_2</span><span class="o">+</span><span class="n">b00</span>
+            <span class="n">V12</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">e12_0</span><span class="o">+</span><span class="n">e12_1</span><span class="o">+</span><span class="n">e12_2</span><span class="o">-</span><span class="n">b00</span>
+            <span class="n">V12</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">b01</span>
+            <span class="n">V12</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">b10</span>
+
+            <span class="k">return</span> <span class="n">V12</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span></div>
+
+
+<div class="viewcode-block" id="V12_ED">
+<a class="viewcode-back" href="../../documentation.html#pyRET.Vtools.V12_ED">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">V12_ED</span><span class="p">(</span><span class="n">pEDs</span><span class="p">,</span> <span class="n">rvects</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span> <span class="n">nIndex</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span> <span class="n">radtype</span> <span class="o">=</span> <span class="s2">&quot;J&quot;</span><span class="p">,</span> <span class="n">Cgauge</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">etaeff</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span> <span class="n">includespin</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes matrix element under the electric dipole approximation.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        pEDs (numpy array of shape (3,)): The x, y, z components of the electric dipole moment vector.</span>
+<span class="sd">        rvects (numpy array of shape (3, n1, n2, ... nM)): The x, y, z positions of the dipole.</span>
+<span class="sd">        k (float): The wavevector.</span>
+<span class="sd">        L, M, P (int): Multipole parameters.</span>
+<span class="sd">        nIndex (float): Refractive index.</span>
+<span class="sd">        radtype (str): Type of radial function.</span>
+<span class="sd">        Cgauge (int): Gauge parameter.</span>
+<span class="sd">        etaeff (float): Effective mass correction.</span>
+<span class="sd">        includespin (bool): Whether to include spin effects.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        V12 (numpy array of shape (2, 2, n1, n2, ... nM)): The interaction matrix element under the electric dipole approximation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>  
+    
+    <span class="n">consts</span> <span class="o">=</span> <span class="n">Consts</span><span class="p">()</span>
+    <span class="n">mu0</span> <span class="o">=</span> <span class="n">consts</span><span class="o">.</span><span class="n">mu0</span>
+    <span class="n">eps0</span> <span class="o">=</span> <span class="n">consts</span><span class="o">.</span><span class="n">eps0</span>
+    <span class="n">lam</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">nIndex</span><span class="o">/</span><span class="n">k</span>
+    <span class="n">omega</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">consts</span><span class="o">.</span><span class="n">c</span><span class="o">/</span><span class="n">lam</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">consts</span><span class="o">.</span><span class="n">qe</span>
+    <span class="n">hbar</span><span class="o">=</span> <span class="n">consts</span><span class="o">.</span><span class="n">hplank</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+    <span class="n">hplank</span> <span class="o">=</span> <span class="n">consts</span><span class="o">.</span><span class="n">hplank</span>
+    <span class="n">me</span> <span class="o">=</span> <span class="n">consts</span><span class="o">.</span><span class="n">me</span><span class="o">*</span><span class="n">etaeff</span>
+    <span class="n">muB</span> <span class="o">=</span> <span class="n">e</span><span class="o">*</span><span class="n">consts</span><span class="o">.</span><span class="n">hbar</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">me</span><span class="p">)</span>
+    
+    <span class="n">V12</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">rvects</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">dtype</span> <span class="o">=</span> <span class="nb">complex</span><span class="p">)</span> 
+    
+    <span class="c1">#Initialize the multipole:</span>
+    <span class="n">A</span><span class="p">,</span> <span class="n">A0</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">H</span> <span class="o">=</span> <span class="n">InitializeMultipole</span><span class="p">([</span><span class="n">L</span><span class="p">],</span> <span class="p">[</span><span class="n">M</span><span class="p">],</span> <span class="p">[</span><span class="n">P</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.</span><span class="p">],</span> <span class="n">lam</span> <span class="p">,</span> <span class="n">nIndex</span><span class="p">,</span> <span class="n">L</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">Cgauge</span><span class="p">,</span> <span class="n">radtype</span><span class="o">=</span><span class="n">radtype</span><span class="p">)</span>
+    <span class="c1">#Fields computed over the radial grid provided as argument</span>
+    <span class="c1">#Ar = A.torgrid(rgrid)</span>
+    <span class="c1">#A0r = A0.torgrid(rgrid)</span>
+    <span class="n">Er</span> <span class="o">=</span> <span class="n">E</span><span class="o">.</span><span class="n">torgrid</span><span class="p">(</span><span class="n">rvects</span><span class="p">)</span>
+    <span class="n">Hr</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">torgrid</span><span class="p">(</span><span class="n">rvects</span><span class="p">)</span>
+    <span class="c1">#divAr = divergence(A).torgrid(rgrid)</span>
+    <span class="c1">#Dipole-dipole coupling:</span>
+    <span class="n">v12</span> <span class="o">=</span> <span class="n">Er</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">pEDs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">Er</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">pEDs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">Er</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">pEDs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">includespin</span><span class="p">:</span> <span class="k">return</span> <span class="n">v12</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="nb">complex</span><span class="p">)</span>
+    <span class="c1">#Spin flip components:</span>
+    <span class="n">b00</span> <span class="o">=</span> <span class="n">muB</span><span class="o">*</span><span class="n">mu0</span> <span class="o">*</span> <span class="n">Hr</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> 
+    <span class="n">b01</span> <span class="o">=</span> <span class="n">muB</span><span class="o">*</span><span class="n">mu0</span> <span class="o">*</span> <span class="p">(</span><span class="n">Hr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">Hr</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> 
+    <span class="n">b10</span> <span class="o">=</span> <span class="n">muB</span> <span class="o">*</span> <span class="n">mu0</span> <span class="o">*</span> <span class="p">(</span><span class="n">Hr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">Hr</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="n">V12</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">v12</span><span class="o">+</span><span class="n">b00</span>
+    <span class="n">V12</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">v12</span><span class="o">-</span><span class="n">b00</span>
+    <span class="n">V12</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">b01</span>
+    <span class="n">V12</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">b10</span>
+    
+    
+    <span class="k">return</span> <span class="n">V12</span></div>
+
+
+<div class="viewcode-block" id="V12_MD">
+<a class="viewcode-back" href="../../documentation.html#pyRET.Vtools.V12_MD">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">V12_MD</span><span class="p">(</span><span class="n">pMDs</span><span class="p">,</span> <span class="n">rvects</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span> <span class="n">nIndex</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span> <span class="n">radtype</span> <span class="o">=</span> <span class="s2">&quot;J&quot;</span><span class="p">,</span> <span class="n">Cgauge</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">etaeff</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span> <span class="n">includespin</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes matrix element under the magnetic dipole approximation.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        pMDs (numpy array of shape (3,)): The x, y, z components of the magnetic dipole moment vector.</span>
+<span class="sd">        rvects (numpy array of shape (3, n1, n2, ... nM)): The x, y, z positions of the dipole.</span>
+<span class="sd">        k (float): The wavevector.</span>
+<span class="sd">        L, M, P (int): Multipole parameters.</span>
+<span class="sd">        nIndex (float): Refractive index.</span>
+<span class="sd">        radtype (str): Type of radial function.</span>
+<span class="sd">        Cgauge (int): Gauge parameter.</span>
+<span class="sd">        etaeff (float): Effective mass correction.</span>
+<span class="sd">        includespin (bool): Whether to include spin effects.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        V12 (numpy array of shape (2, 2, n1, n2, ... nM)): The interaction matrix element under the magnetic dipole approximation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>  
+    
+    <span class="n">consts</span> <span class="o">=</span> <span class="n">Consts</span><span class="p">()</span>
+    <span class="n">mu0</span> <span class="o">=</span> <span class="n">consts</span><span class="o">.</span><span class="n">mu0</span>
+    <span class="n">eps0</span> <span class="o">=</span> <span class="n">consts</span><span class="o">.</span><span class="n">eps0</span>
+    <span class="n">lam</span> <span class="o">=</span>  <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">nIndex</span><span class="o">/</span><span class="n">k</span>
+    <span class="n">omega</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">consts</span><span class="o">.</span><span class="n">c</span><span class="o">/</span><span class="n">lam</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">consts</span><span class="o">.</span><span class="n">qe</span>
+    <span class="n">hbar</span><span class="o">=</span> <span class="n">consts</span><span class="o">.</span><span class="n">hplank</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+    <span class="n">hplank</span> <span class="o">=</span> <span class="n">consts</span><span class="o">.</span><span class="n">hplank</span>
+    <span class="n">me</span> <span class="o">=</span> <span class="n">consts</span><span class="o">.</span><span class="n">me</span><span class="o">*</span><span class="n">etaeff</span>
+    <span class="n">muB</span> <span class="o">=</span> <span class="n">e</span><span class="o">*</span><span class="n">consts</span><span class="o">.</span><span class="n">hbar</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">me</span><span class="p">)</span>
+    
+    <span class="n">V12</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">rvects</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">dtype</span> <span class="o">=</span> <span class="nb">complex</span><span class="p">)</span> 
+    <span class="c1">#Initialize the multipole:</span>
+    <span class="n">A</span><span class="p">,</span> <span class="n">A0</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">H</span> <span class="o">=</span> <span class="n">InitializeMultipole</span><span class="p">([</span><span class="n">L</span><span class="p">],</span> <span class="p">[</span><span class="n">M</span><span class="p">],</span> <span class="p">[</span><span class="n">P</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.</span><span class="p">],</span> <span class="n">lam</span> <span class="p">,</span> <span class="n">nIndex</span><span class="p">,</span> <span class="n">L</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">Cgauge</span><span class="p">,</span> <span class="n">radtype</span><span class="o">=</span><span class="n">radtype</span><span class="p">)</span>
+    <span class="c1">#Fields computed over the radial grid provided as argument</span>
+    <span class="c1">#Ar = A.torgrid(rgrid)</span>
+    <span class="c1">#A0r = A0.torgrid(rgrid)</span>
+    <span class="c1">#Er = E.torgrid(rvect)</span>
+    <span class="n">Hr</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">torgrid</span><span class="p">(</span><span class="n">rvects</span><span class="p">)</span>
+    <span class="c1">#divAr = divergence(A).torgrid(rgrid)</span>
+    <span class="c1">#Dipole-dipole coupling:</span>
+    <span class="n">v12</span> <span class="o">=</span><span class="n">mu0</span><span class="o">*</span><span class="p">(</span><span class="n">Hr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">pMDs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">Hr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">pMDs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">Hr</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">pMDs</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">includespin</span><span class="p">:</span> <span class="k">return</span> <span class="n">v12</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="nb">complex</span><span class="p">)</span>
+
+    <span class="c1">#Spin flip components:</span>
+    <span class="n">b00</span> <span class="o">=</span> <span class="n">muB</span><span class="o">*</span><span class="n">mu0</span> <span class="o">*</span> <span class="n">Hr</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> 
+    <span class="n">b01</span> <span class="o">=</span> <span class="n">muB</span><span class="o">*</span><span class="n">mu0</span> <span class="o">*</span> <span class="p">(</span><span class="n">Hr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">Hr</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> 
+    <span class="n">b10</span> <span class="o">=</span> <span class="n">muB</span> <span class="o">*</span> <span class="n">mu0</span> <span class="o">*</span> <span class="p">(</span><span class="n">Hr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">Hr</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="n">V12</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">v12</span><span class="o">+</span><span class="n">b00</span>
+    <span class="n">V12</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">v12</span><span class="o">-</span><span class="n">b00</span>
+    <span class="n">V12</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">b01</span>
+    <span class="n">V12</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">b10</span>
+    
+    
+    <span class="k">return</span> <span class="n">V12</span></div>
+
+    
+<div class="viewcode-block" id="Veded">
+<a class="viewcode-back" href="../../documentation.html#pyRET.Vtools.Veded">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">Veded</span><span class="p">(</span><span class="n">p1vec</span><span class="p">,</span> <span class="n">p2vec</span><span class="p">,</span> <span class="n">rvects</span><span class="p">,</span> <span class="n">nIndex</span><span class="p">,</span> <span class="n">omega</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute dipole-dipole interaction.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        p1vec (numpy array of shape (3,)): The x, y, z components of the first dipole moment vector.</span>
+<span class="sd">        p2vec (numpy array of shape (3,)): The x, y, z components of the second dipole moment vector.</span>
+<span class="sd">        rvects (numpy array of shape (3, n1, n2, ... nM)): The x, y, z positions of the dipoles.</span>
+<span class="sd">        nIndex (float): Refractive index.</span>
+<span class="sd">        omega (float): Angular frequency.</span>
+
+<span class="sd">    mode = &quot;nearfield&quot; or &quot;general&quot;</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        Veded (numpy array of shape (n1, n2, ... nM)): Dipole-dipole interaction energy in SI units.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">consts</span> <span class="o">=</span> <span class="n">Consts</span><span class="p">()</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">rvects</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span><span class="n">rvects</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span><span class="n">rvects</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    
+    <span class="n">k</span> <span class="o">=</span> <span class="n">nIndex</span><span class="o">*</span><span class="n">omega</span><span class="o">/</span> <span class="n">consts</span><span class="o">.</span><span class="n">c</span>
+    
+    
+    <span class="n">pdotp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">p1vec</span><span class="o">*</span><span class="n">p2vec</span><span class="p">)</span>
+    
+    <span class="n">p1dotrhat</span> <span class="o">=</span> <span class="p">(</span><span class="n">p1vec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">rvects</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span> <span class="n">p1vec</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">rvects</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span> <span class="n">p1vec</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">rvects</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">/</span><span class="n">r</span>
+    <span class="n">p2dotrhat</span> <span class="o">=</span> <span class="p">(</span><span class="n">p2vec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">rvects</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span> <span class="n">p2vec</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">rvects</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span> <span class="n">p2vec</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">rvects</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">/</span><span class="n">r</span>
+    
+    <span class="n">kr</span> <span class="o">=</span> <span class="n">k</span><span class="o">*</span><span class="n">r</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="p">(</span><span class="n">kr</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">kr</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">*</span> <span class="n">pdotp</span> <span class="o">+</span> <span class="p">(</span><span class="o">-</span><span class="n">kr</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span><span class="mi">3</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">kr</span> <span class="o">+</span> <span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="n">p1dotrhat</span> <span class="o">*</span> <span class="n">p2dotrhat</span>
+    
+    <span class="n">Veded</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">k</span><span class="o">*</span><span class="n">r</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">consts</span><span class="o">.</span><span class="n">eps0</span><span class="o">*</span><span class="n">nIndex</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">r</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="n">f</span>
+    
+    <span class="k">return</span> <span class="n">Veded</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, University of Chicago and Argonne National Laboratory.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

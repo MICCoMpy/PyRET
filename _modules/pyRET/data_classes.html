@@ -1,0 +1,780 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyRET.data_classes &mdash; PyRET  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            PyRET
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../documentation.html">Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../credits.html">Credits</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PyRET</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pyRET.data_classes</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyRET.data_classes</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.wavefunctions</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="c1">#from .photoniccavity import CylindricalCavity</span>
+
+<div class="viewcode-block" id="WFunctions_data">
+<a class="viewcode-back" href="../../documentation.html#pyRET.data_classes.WFunctions_data">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">WFunctions_data</span><span class="p">():</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    Dataclass for handling wavefunctions.</span>
+<span class="sd">    </span>
+<span class="sd">    Attributes:</span>
+<span class="sd">        emitterTypes (list of string): list of emitter types.</span>
+<span class="sd">        states (list of list of string): list of list of states.</span>
+<span class="sd">        iKSs (list of list of int): list of list of KS indices for the states.</span>
+<span class="sd">        rgridwf (list of arrays): list of rgridwfs- separate for each emitter.</span>
+<span class="sd">        Ns (list of dict): list of dict of normalization constants for each state.</span>
+<span class="sd">        pwout (list of string): list of pw.out texts correspinding to each emitter for book keeping.</span>
+<span class="sd">        wfs (list of dict): list of dict of wfs (WFunction class object) for each state as the key. </span>
+<span class="sd">        kwfs (list of dict): list of dict of k operated on wfs (Vector Fields) for each state as the key. Can be empty</span>
+<span class="sd">        wfrs (list of dict): list of dict of values of the wavefunctions over corresponding position grids.</span>
+<span class="sd">        kwfrs (list of dict): list of dict of values of the k operated wavefunctions over corresponding position grids.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>    
+
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">emitterTypes</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">states</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">iKSs</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">rgridwf</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">Ns</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">pwout</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">wfs</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">kwfs</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">wfrs</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">kwfrs</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        
+        <span class="c1">#Defined based on a planne wave basis</span>
+        <span class="k">if</span> <span class="n">emitterTypes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">emitterTypes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">emitterTypes</span> <span class="o">=</span> <span class="n">emitterTypes</span>
+        
+        <span class="k">if</span> <span class="n">states</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">states</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">states</span> <span class="o">=</span> <span class="n">states</span>
+        
+        <span class="k">if</span> <span class="n">iKSs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">iKSs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">iKSs</span> <span class="o">=</span> <span class="n">iKSs</span>
+            
+            
+        <span class="k">if</span> <span class="n">rgridwf</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">rgridwf</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rgridwf</span> <span class="o">=</span> <span class="n">rgridwf</span>
+            
+        <span class="k">if</span> <span class="n">Ns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">Ns</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Ns</span> <span class="o">=</span> <span class="n">Ns</span>
+
+        <span class="k">if</span> <span class="n">pwout</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">pwout</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pwout</span> <span class="o">=</span> <span class="n">pwout</span>
+        
+        <span class="k">if</span> <span class="n">wfs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">wfs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wfs</span> <span class="o">=</span> <span class="n">wfs</span>
+            
+        <span class="k">if</span> <span class="n">kwfs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">kwfs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">kwfs</span> <span class="o">=</span> <span class="n">kwfs</span>
+            
+        <span class="k">if</span> <span class="n">wfrs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">wfrs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wfrs</span> <span class="o">=</span> <span class="n">wfrs</span>
+            
+        <span class="k">if</span> <span class="n">kwfrs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">kwfrs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">kwfrs</span> <span class="o">=</span> <span class="n">kwfrs</span>
+            
+        <span class="k">return</span>
+    
+<div class="viewcode-block" id="WFunctions_data.Encode">
+<a class="viewcode-back" href="../../documentation.html#pyRET.data_classes.WFunctions_data.Encode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">Encode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Jsonize the data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">Encoded</span> <span class="o">=</span> <span class="p">{}</span>
+        
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;Class&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">})</span>
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;emitterTypes&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">emitterTypes</span><span class="p">})</span>
+        <span class="c1">#print(&quot;emitters&quot;)</span>
+        
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;states&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">})</span>
+        <span class="c1">#print(&quot;states&quot;)</span>
+        
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;iKSs&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">iKSs</span><span class="p">})</span>
+        <span class="c1">#print(&quot;iKSs&quot;)</span>
+        
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;rgridwf&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">rgrid</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="k">for</span> <span class="n">rgrid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rgridwf</span><span class="p">]})</span>
+        <span class="c1">#print(&quot;rgridwf&quot;)</span>
+        
+        
+        <span class="n">Ns</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ns</span><span class="p">:</span>
+            <span class="n">N</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">item</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">N</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">key</span><span class="p">:</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="n">key</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="n">key</span><span class="p">]))})</span>
+            <span class="n">Ns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;Ns&quot;</span><span class="p">:</span> <span class="n">Ns</span><span class="p">})</span>
+        <span class="c1">#print(&quot;Ns&quot;)</span>
+        
+        
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;pwout&quot;</span> <span class="p">:</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pwout</span><span class="p">]})</span>
+        <span class="c1">#print(&quot;pwout&quot;)</span>
+        
+        
+        <span class="n">wfs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">wfs</span><span class="p">:</span>
+            <span class="n">wf</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">item</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">wf</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">key</span><span class="p">:</span> <span class="n">item</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">Encode</span><span class="p">()})</span>
+            <span class="n">wfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">wf</span><span class="p">)</span>
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;wfs&quot;</span><span class="p">:</span> <span class="n">wfs</span><span class="p">})</span>
+        <span class="c1">#print(&quot;wfs&quot;)</span>
+        
+        <span class="n">kwfs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwfs</span><span class="p">:</span>
+            <span class="n">kwf</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">item</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">kwf</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">key</span><span class="p">:</span> <span class="n">item</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">Encode</span><span class="p">()})</span>
+            <span class="n">kwfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kwf</span><span class="p">)</span>
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;kwfs&quot;</span><span class="p">:</span> <span class="n">kwfs</span><span class="p">})</span>
+        <span class="c1">#print(&quot;kwfs&quot;)</span>
+        
+        <span class="n">wfrs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">wfrs</span><span class="p">:</span>
+            <span class="n">wfr</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">item</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">wfr</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">key</span><span class="p">:</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="n">key</span><span class="p">])</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="n">key</span><span class="p">])</span><span class="o">.</span><span class="n">tolist</span><span class="p">())})</span>
+            <span class="n">wfrs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">wfr</span><span class="p">)</span>
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;wfrs&quot;</span><span class="p">:</span> <span class="n">wfrs</span><span class="p">})</span>
+        <span class="c1">#print(&quot;wfrs&quot;)</span>
+        
+        
+        <span class="n">kwfrs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwfrs</span><span class="p">:</span>
+            <span class="n">kwfr</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">item</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">kwfr</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">key</span><span class="p">:</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="n">key</span><span class="p">])</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="n">key</span><span class="p">])</span><span class="o">.</span><span class="n">tolist</span><span class="p">())})</span>
+            <span class="n">kwfrs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kwfr</span><span class="p">)</span>
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;kwfrs&quot;</span><span class="p">:</span> <span class="n">kwfrs</span><span class="p">})</span>
+        <span class="c1">#print(&quot;kwfrs&quot;)</span>
+        
+        <span class="k">return</span> <span class="n">Encoded</span></div>
+
+    
+<div class="viewcode-block" id="WFunctions_data.Decode">
+<a class="viewcode-back" href="../../documentation.html#pyRET.data_classes.WFunctions_data.Decode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">Decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load data from a jsonized form.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;Class&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span>
+            <span class="n">clsname</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;Class&quot;</span><span class="p">]</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">clsname</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Wrong decoder function. The json objeect was from </span><span class="si">{</span><span class="n">clsname</span><span class="si">}</span><span class="s2"> class, but is being decoded by&quot;</span><span class="o">+</span>
+            <span class="sa">f</span><span class="s2">&quot;the decoder of the class </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">emitterTypes</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;emitterTypes&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">states</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;states&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iKSs</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;iKSs&quot;</span><span class="p">]</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">rgridwf</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;rgridwf&quot;</span><span class="p">]]</span>
+        
+        
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;Ns&quot;</span><span class="p">]:</span>
+            <span class="n">N</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">item</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                
+                <span class="n">N</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">key</span><span class="p">:</span> <span class="n">item</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">item</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">1</span><span class="p">]})</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Ns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">pwout</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;pwout&quot;</span><span class="p">]</span>
+        
+        
+        
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;wfs&quot;</span><span class="p">]:</span>
+            <span class="n">wf</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">item</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">wf</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">key</span><span class="p">:</span> <span class="n">WFunction</span><span class="p">()</span><span class="o">.</span><span class="n">Decode</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="n">key</span><span class="p">])})</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">wf</span><span class="p">)</span>
+        
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;kwfs&quot;</span><span class="p">]:</span>
+            <span class="n">kwf</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">item</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">kwf</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">key</span><span class="p">:</span> <span class="n">WFunction</span><span class="p">()</span><span class="o">.</span><span class="n">Decode</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="n">key</span><span class="p">])})</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">kwfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">wf</span><span class="p">)</span>
+        
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;wfrs&quot;</span><span class="p">]:</span>
+            <span class="n">wfr</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">item</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">wfr</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">key</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">1</span><span class="p">])})</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wfrs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">wfr</span><span class="p">)</span>
+        
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;kwfrs&quot;</span><span class="p">]:</span>
+            <span class="n">kwfr</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">item</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">kwfr</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">key</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">1</span><span class="p">])})</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">kwfrs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kwfr</span><span class="p">)</span>
+        
+        
+        
+        <span class="k">return</span> <span class="bp">self</span></div>
+</div>
+
+
+    
+<div class="viewcode-block" id="Positions_data">
+<a class="viewcode-back" href="../../documentation.html#pyRET.data_classes.Positions_data">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Positions_data</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    Dataclass representing relative positions of the emitters. The attributes are dictionaries with the convention of first key = absorber id and second key = emitter id. </span>
+<span class="sd">    The values are arrays of the corresponding data.</span>
+<span class="sd">    </span>
+<span class="sd">    Attributes:</span>
+<span class="sd">        Rs (dict of dict of numpy arrays): dictionary of dictionaries of radial positions of the emitters with respect to the absorber.</span>
+<span class="sd">        Ts (dict of dict of numpy arrays): dictionary of dictionaries of polar angles of the emitters with respect to the absorber.</span>
+<span class="sd">        Ps (dict of dict of numpy arrays): dictionary of dictionaries of azimuthal angles of the emitters with respect to the absorber.</span>
+<span class="sd">        Rg (dict of dict of numpy arrays): R in grid format.</span>
+<span class="sd">        Tg (dict of dict of numpy arrays): T in grid format.</span>
+<span class="sd">        Pg (dict of dict of numpy arrays): P in grid format.</span>
+<span class="sd">        Rvects (dict of dict of numpy arrays): each array has a shape of (3, Nr, Nt, Np) and represents the position vectors of the emitters with respect to the absorber in Cartesian coordinates over the position grid. The first index of the array is for the x, y, z components of the position vector.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>    
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">Rs</span> <span class="o">=</span> <span class="p">{}</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">Ts</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Ps</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Rg</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Tg</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Pg</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Rvects</span> <span class="o">=</span> <span class="p">{}</span>
+        
+        <span class="k">return</span>
+    
+<div class="viewcode-block" id="Positions_data.Encode">
+<a class="viewcode-back" href="../../documentation.html#pyRET.data_classes.Positions_data.Encode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">Encode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Jsonize the data</span>
+<span class="sd">        &quot;&quot;&quot;</span>        
+
+        <span class="n">Encoded</span> <span class="o">=</span> <span class="p">{}</span>
+        
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;Class&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">})</span>
+        
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;Rs&quot;</span><span class="p">:</span> <span class="p">{}})</span>
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;Ts&quot;</span><span class="p">:</span> <span class="p">{}})</span>
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;Ps&quot;</span><span class="p">:</span> <span class="p">{}})</span>
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;Rg&quot;</span><span class="p">:</span> <span class="p">{}})</span>
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;Tg&quot;</span><span class="p">:</span> <span class="p">{}})</span>
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;Pg&quot;</span><span class="p">:</span> <span class="p">{}})</span>
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;Rvects&quot;</span><span class="p">:</span> <span class="p">{}})</span>
+        <span class="k">for</span> <span class="n">key1</span><span class="p">,</span> <span class="n">item1</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">Rs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">Encoded</span><span class="p">[</span><span class="s2">&quot;Rs&quot;</span><span class="p">][</span><span class="n">key1</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">Encoded</span><span class="p">[</span><span class="s2">&quot;Ts&quot;</span><span class="p">][</span><span class="n">key1</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">Encoded</span><span class="p">[</span><span class="s2">&quot;Ps&quot;</span><span class="p">][</span><span class="n">key1</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">Encoded</span><span class="p">[</span><span class="s2">&quot;Rg&quot;</span><span class="p">][</span><span class="n">key1</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">Encoded</span><span class="p">[</span><span class="s2">&quot;Tg&quot;</span><span class="p">][</span><span class="n">key1</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">Encoded</span><span class="p">[</span><span class="s2">&quot;Pg&quot;</span><span class="p">][</span><span class="n">key1</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">Encoded</span><span class="p">[</span><span class="s2">&quot;Rvects&quot;</span><span class="p">][</span><span class="n">key1</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                                        
+            <span class="k">for</span> <span class="n">key2</span><span class="p">,</span> <span class="n">item2</span> <span class="ow">in</span> <span class="n">item1</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">Encoded</span><span class="p">[</span><span class="s2">&quot;Rs&quot;</span><span class="p">][</span><span class="n">key1</span><span class="p">][</span><span class="n">key2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Rs</span><span class="p">[</span><span class="n">key1</span><span class="p">][</span><span class="n">key2</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                <span class="n">Encoded</span><span class="p">[</span><span class="s2">&quot;Ts&quot;</span><span class="p">][</span><span class="n">key1</span><span class="p">][</span><span class="n">key2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ts</span><span class="p">[</span><span class="n">key1</span><span class="p">][</span><span class="n">key2</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                <span class="n">Encoded</span><span class="p">[</span><span class="s2">&quot;Ps&quot;</span><span class="p">][</span><span class="n">key1</span><span class="p">][</span><span class="n">key2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ps</span><span class="p">[</span><span class="n">key1</span><span class="p">][</span><span class="n">key2</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                <span class="n">Encoded</span><span class="p">[</span><span class="s2">&quot;Rg&quot;</span><span class="p">][</span><span class="n">key1</span><span class="p">][</span><span class="n">key2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Rg</span><span class="p">[</span><span class="n">key1</span><span class="p">][</span><span class="n">key2</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                <span class="n">Encoded</span><span class="p">[</span><span class="s2">&quot;Tg&quot;</span><span class="p">][</span><span class="n">key1</span><span class="p">][</span><span class="n">key2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Tg</span><span class="p">[</span><span class="n">key1</span><span class="p">][</span><span class="n">key2</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                <span class="n">Encoded</span><span class="p">[</span><span class="s2">&quot;Pg&quot;</span><span class="p">][</span><span class="n">key1</span><span class="p">][</span><span class="n">key2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Pg</span><span class="p">[</span><span class="n">key1</span><span class="p">][</span><span class="n">key2</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                <span class="n">Encoded</span><span class="p">[</span><span class="s2">&quot;Rvects&quot;</span><span class="p">][</span><span class="n">key1</span><span class="p">][</span><span class="n">key2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Rvects</span><span class="p">[</span><span class="n">key1</span><span class="p">][</span><span class="n">key2</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                
+    
+        <span class="k">return</span> <span class="n">Encoded</span></div>
+
+
+    
+<div class="viewcode-block" id="Positions_data.Decode">
+<a class="viewcode-back" href="../../documentation.html#pyRET.data_classes.Positions_data.Decode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">Decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load data from a jsonized form.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;Class&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span>
+            <span class="n">clsname</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;Class&quot;</span><span class="p">]</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">clsname</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Wrong decoder function. The json objeect was from </span><span class="si">{</span><span class="n">clsname</span><span class="si">}</span><span class="s2"> class, but is being decoded by&quot;</span><span class="o">+</span>
+            <span class="sa">f</span><span class="s2">&quot;the decoder of the class </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+        <span class="k">for</span> <span class="n">key1</span><span class="p">,</span> <span class="n">item1</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;Rs&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Rs</span><span class="p">[</span><span class="n">key1</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Ts</span><span class="p">[</span><span class="n">key1</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Ps</span><span class="p">[</span><span class="n">key1</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Rg</span><span class="p">[</span><span class="n">key1</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Tg</span><span class="p">[</span><span class="n">key1</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Pg</span><span class="p">[</span><span class="n">key1</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Rvects</span><span class="p">[</span><span class="n">key1</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                                        
+            <span class="k">for</span> <span class="n">key2</span><span class="p">,</span> <span class="n">item2</span> <span class="ow">in</span> <span class="n">item1</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Rs</span><span class="p">[</span><span class="n">key1</span><span class="p">][</span><span class="n">key2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;Rs&quot;</span><span class="p">][</span><span class="n">key1</span><span class="p">][</span><span class="n">key2</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Ts</span><span class="p">[</span><span class="n">key1</span><span class="p">][</span><span class="n">key2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;Ts&quot;</span><span class="p">][</span><span class="n">key1</span><span class="p">][</span><span class="n">key2</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Ps</span><span class="p">[</span><span class="n">key1</span><span class="p">][</span><span class="n">key2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;Ps&quot;</span><span class="p">][</span><span class="n">key1</span><span class="p">][</span><span class="n">key2</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Rg</span><span class="p">[</span><span class="n">key1</span><span class="p">][</span><span class="n">key2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;Rg&quot;</span><span class="p">][</span><span class="n">key1</span><span class="p">][</span><span class="n">key2</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Tg</span><span class="p">[</span><span class="n">key1</span><span class="p">][</span><span class="n">key2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;Tg&quot;</span><span class="p">][</span><span class="n">key1</span><span class="p">][</span><span class="n">key2</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Pg</span><span class="p">[</span><span class="n">key1</span><span class="p">][</span><span class="n">key2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;Pg&quot;</span><span class="p">][</span><span class="n">key1</span><span class="p">][</span><span class="n">key2</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Rvects</span><span class="p">[</span><span class="n">key1</span><span class="p">][</span><span class="n">key2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;Rvects&quot;</span><span class="p">][</span><span class="n">key1</span><span class="p">][</span><span class="n">key2</span><span class="p">])</span>
+                
+                
+        <span class="k">return</span> <span class="bp">self</span></div>
+</div>
+
+    
+
+<div class="viewcode-block" id="Positions_data_1config">
+<a class="viewcode-back" href="../../documentation.html#pyRET.data_classes.Positions_data_1config">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Positions_data_1config</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Dataclass representing relative positions of the emitters. This is similar to the Positions_data class but is for a single configuration of emitter-absorber positions.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        Rs (numpy array): radial positions of the emitters with respect to the absorber.</span>
+<span class="sd">        Ts (numpy array): polar angles of the emitters with respect to the absorber.</span>
+<span class="sd">        Ps (numpy array): azimuthal angles of the emitters with respect to the absorber.</span>
+<span class="sd">        Rvects (numpy array): position vectors of the emitters with respect to the absorber in Cartesian coordinates.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>    
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">Rs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>    
+        <span class="bp">self</span><span class="o">.</span><span class="n">Ts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Ps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Rvects</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+        
+        <span class="k">return</span>
+    
+<div class="viewcode-block" id="Positions_data_1config.Encode">
+<a class="viewcode-back" href="../../documentation.html#pyRET.data_classes.Positions_data_1config.Encode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">Encode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Jsonize the data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">Encoded</span> <span class="o">=</span> <span class="p">{}</span>
+        
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;Class&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">})</span>
+        
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;Rs&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">Rs</span><span class="o">.</span><span class="n">tolist</span><span class="p">()})</span>
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;Ts&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ts</span><span class="o">.</span><span class="n">tolist</span><span class="p">()})</span>
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;Ps&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ps</span><span class="o">.</span><span class="n">tolist</span><span class="p">()})</span>
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;Rvects&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">Rvects</span><span class="o">.</span><span class="n">tolist</span><span class="p">()})</span>
+        
+        <span class="k">return</span> <span class="n">Encoded</span></div>
+
+
+    
+<div class="viewcode-block" id="Positions_data_1config.Decode">
+<a class="viewcode-back" href="../../documentation.html#pyRET.data_classes.Positions_data_1config.Decode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">Decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load data from a jsonized form.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;Class&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span>
+            <span class="n">clsname</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;Class&quot;</span><span class="p">]</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">clsname</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Wrong decoder function. The json objeect was from </span><span class="si">{</span><span class="n">clsname</span><span class="si">}</span><span class="s2"> class, but is being decoded by&quot;</span><span class="o">+</span>
+            <span class="sa">f</span><span class="s2">&quot;the decoder of the class </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">Rs</span> <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;Rs&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Ts</span> <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;Ts&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Ps</span> <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;Ps&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Rvects</span> <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;Rvects&quot;</span><span class="p">])</span>
+        
+        
+                
+        <span class="k">return</span> <span class="bp">self</span>    </div>
+</div>
+
+    
+    
+<div class="viewcode-block" id="Emitters_data">
+<a class="viewcode-back" href="../../documentation.html#pyRET.data_classes.Emitters_data">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Emitters_data</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    Dataclass representing types and corresponding information on the emitters.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        EmType(dict): dictionary with Emitter IDs as keys and emitter types as strings.</span>
+<span class="sd">        T1(dict): dictionary with Emitter IDs as keys and T1 values.</span>
+<span class="sd">        w(dict): dictionary with Emitter IDs as keys and transition frequencies (rad/s).</span>
+<span class="sd">        k(dict): dictionary with Emitter IDs as keys and wave numbers (1/m).</span>
+<span class="sd">        nIndex(dict): dictionary with Emitter IDs as keys and refractive indices of the medium the emitter sits in.</span>
+<span class="sd">        pMPs(dict): dictionary with Emitter IDs as keys-- predefined multipole moments (if any) of the emitters.        </span>
+<span class="sd">    &quot;&quot;&quot;</span>    
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">EmType</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">T1</span> <span class="o">=</span> <span class="p">{}</span>    
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nIndex</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pMPs</span> <span class="o">=</span> <span class="p">{}</span>
+        
+        <span class="k">return</span>
+    
+<div class="viewcode-block" id="Emitters_data.Encode">
+<a class="viewcode-back" href="../../documentation.html#pyRET.data_classes.Emitters_data.Encode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">Encode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Jsonize the data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">Encoded</span> <span class="o">=</span> <span class="p">{}</span>
+        
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;Class&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">})</span>
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;nIndex&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">nIndex</span><span class="p">})</span>
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;EmType&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">EmType</span><span class="p">})</span>
+        
+        <span class="n">T1</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">em</span><span class="p">,</span> <span class="n">item1</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">T1</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">T1</span><span class="p">[</span><span class="n">em</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">transition</span><span class="p">,</span> <span class="n">item2</span> <span class="ow">in</span> <span class="n">item1</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">T1</span><span class="p">[</span><span class="n">em</span><span class="p">][</span><span class="n">transition</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">item2</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">item2</span><span class="p">)]</span>
+        
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;T1&quot;</span><span class="p">:</span> <span class="n">T1</span><span class="p">})</span>
+        
+        <span class="n">w</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">em</span><span class="p">,</span> <span class="n">item1</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">w</span><span class="p">[</span><span class="n">em</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">transition</span><span class="p">,</span> <span class="n">item2</span> <span class="ow">in</span> <span class="n">item1</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">w</span><span class="p">[</span><span class="n">em</span><span class="p">][</span><span class="n">transition</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">item2</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">item2</span><span class="p">)]</span>
+            
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;w&quot;</span><span class="p">:</span> <span class="n">w</span><span class="p">})</span>
+        
+        
+        <span class="n">k</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">em</span><span class="p">,</span> <span class="n">item1</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">k</span><span class="p">[</span><span class="n">em</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">transition</span><span class="p">,</span> <span class="n">item2</span> <span class="ow">in</span> <span class="n">item1</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">k</span><span class="p">[</span><span class="n">em</span><span class="p">][</span><span class="n">transition</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">item2</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">item2</span><span class="p">)]</span>
+            
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;k&quot;</span><span class="p">:</span> <span class="n">k</span><span class="p">})</span>
+        
+        
+        <span class="n">pMPs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">em</span><span class="p">,</span> <span class="n">item1</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pMPs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1">#print(f&quot;{em=}&quot;)</span>
+            <span class="n">pMPs</span><span class="p">[</span><span class="n">em</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">transition</span><span class="p">,</span> <span class="n">item2</span> <span class="ow">in</span> <span class="n">item1</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="c1">#print(f&quot;{transition=}&quot;)</span>
+                <span class="n">pMPs</span><span class="p">[</span><span class="n">em</span><span class="p">][</span><span class="n">transition</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">L</span><span class="p">,</span> <span class="n">item3</span> <span class="ow">in</span> <span class="n">item2</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="c1">#print(f&quot;{L=}&quot;)</span>
+                    <span class="n">pMPs</span><span class="p">[</span><span class="n">em</span><span class="p">][</span><span class="n">transition</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">L</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="k">for</span> <span class="n">P</span><span class="p">,</span> <span class="n">item4</span> <span class="ow">in</span> <span class="n">item3</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="c1">#print(f&quot;{P=}&quot;)</span>
+                        <span class="n">pMPs</span><span class="p">[</span><span class="n">em</span><span class="p">][</span><span class="n">transition</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">L</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">P</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> \
+                        <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pMPs</span><span class="p">[</span><span class="n">em</span><span class="p">][</span><span class="n">transition</span><span class="p">][</span><span class="n">L</span><span class="p">][</span><span class="n">P</span><span class="p">])</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+                         <span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pMPs</span><span class="p">[</span><span class="n">em</span><span class="p">][</span><span class="n">transition</span><span class="p">][</span><span class="n">L</span><span class="p">][</span><span class="n">P</span><span class="p">])</span><span class="o">.</span><span class="n">tolist</span><span class="p">()]</span>
+                
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;pMPs&quot;</span><span class="p">:</span> <span class="n">pMPs</span> <span class="p">})</span>
+    
+        <span class="k">return</span> <span class="n">Encoded</span></div>
+
+    
+<div class="viewcode-block" id="Emitters_data.Decode">
+<a class="viewcode-back" href="../../documentation.html#pyRET.data_classes.Emitters_data.Decode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">Decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load data from a jsonized form.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;Class&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span>
+            <span class="n">clsname</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;Class&quot;</span><span class="p">]</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">clsname</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The json objeect was from </span><span class="si">{</span><span class="n">clsname</span><span class="si">}</span><span class="s2"> class, but is being decoded by&quot;</span><span class="o">+</span>
+            <span class="sa">f</span><span class="s2">&quot;the decoder of the class </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">nIndex</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;nIndex&quot;</span><span class="p">]</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">EmType</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;EmType&quot;</span><span class="p">]</span>
+        
+        <span class="n">T1</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">em</span><span class="p">,</span> <span class="n">item1</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;T1&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1">#print(f&quot;{em=}&quot;)</span>
+            <span class="n">T1</span><span class="p">[</span><span class="n">em</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">transition</span><span class="p">,</span> <span class="n">item2</span> <span class="ow">in</span> <span class="n">item1</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">T1</span><span class="p">[</span><span class="n">em</span><span class="p">][</span><span class="n">transition</span><span class="p">]</span> <span class="o">=</span> <span class="n">item2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">item2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">T1</span> <span class="o">=</span> <span class="n">T1</span>
+        
+        <span class="n">w</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">em</span><span class="p">,</span> <span class="n">item1</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;w&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1">#print(f&quot;{em=}&quot;)</span>
+            <span class="n">w</span><span class="p">[</span><span class="n">em</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">transition</span><span class="p">,</span> <span class="n">item2</span> <span class="ow">in</span> <span class="n">item1</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">w</span><span class="p">[</span><span class="n">em</span><span class="p">][</span><span class="n">transition</span><span class="p">]</span> <span class="o">=</span> <span class="n">item2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">item2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="n">w</span>
+        
+        <span class="n">k</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">em</span><span class="p">,</span> <span class="n">item1</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;k&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1">#print(f&quot;{em=}&quot;)</span>
+            <span class="n">k</span><span class="p">[</span><span class="n">em</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">transition</span><span class="p">,</span> <span class="n">item2</span> <span class="ow">in</span> <span class="n">item1</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">k</span><span class="p">[</span><span class="n">em</span><span class="p">][</span><span class="n">transition</span><span class="p">]</span> <span class="o">=</span> <span class="n">item2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">item2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="n">k</span>
+        
+        
+        
+        <span class="n">pMPs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">em</span><span class="p">,</span> <span class="n">item1</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;pMPs&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1">#print(f&quot;{em=}&quot;)</span>
+            <span class="n">pMPs</span><span class="p">[</span><span class="n">em</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">transition</span><span class="p">,</span> <span class="n">item2</span> <span class="ow">in</span> <span class="n">item1</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="c1">#print(f&quot;{transition=}&quot;)</span>
+                <span class="n">pMPs</span><span class="p">[</span><span class="n">em</span><span class="p">][</span><span class="n">transition</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">strL</span><span class="p">,</span> <span class="n">item3</span> <span class="ow">in</span> <span class="n">item2</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="c1">#print(f&quot;{L=}&quot;)</span>
+                    <span class="n">pMPs</span><span class="p">[</span><span class="n">em</span><span class="p">][</span><span class="n">transition</span><span class="p">][</span><span class="nb">int</span><span class="p">(</span><span class="n">strL</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])]</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="k">for</span> <span class="n">strP</span><span class="p">,</span> <span class="n">item4</span> <span class="ow">in</span> <span class="n">item3</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="c1">#print(f&quot;{P=}&quot;)</span>
+                        <span class="n">pMPs</span><span class="p">[</span><span class="n">em</span><span class="p">][</span><span class="n">transition</span><span class="p">][</span><span class="nb">int</span><span class="p">(</span><span class="n">strL</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])][</span><span class="nb">int</span><span class="p">(</span><span class="n">strP</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])]</span> <span class="o">=</span> \
+                        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">item4</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">item4</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                        
+        <span class="bp">self</span><span class="o">.</span><span class="n">pMPs</span> <span class="o">=</span> <span class="n">pMPs</span>
+        
+        <span class="k">return</span> <span class="bp">self</span></div>
+</div>
+
+ 
+    
+<div class="viewcode-block" id="V_data">
+<a class="viewcode-back" href="../../documentation.html#pyRET.data_classes.V_data">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">V_data</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Dataclass containing matrix elements computed in spherical multipolar basis.</span>
+<span class="sd">    </span>
+<span class="sd">    Attributes:</span>
+<span class="sd">        ws(dict): dictionary with absorber IDs as keys and values as dictionaries with emitter IDs as keys and complex numbers as values.</span>
+<span class="sd">        V(dict): nested dictionary of the format V[absorber_id][emitter_id][absorber_transition][L][M][P] = complex ND Array</span>
+<span class="sd">            absorber_transition is of the format &quot;&#39;initial_state&#39;-to-&#39;final_state&#39;&quot;</span>
+<span class="sd">            L, M, P are the multipole order, multipole component and parity of the transition respectively.</span>
+<span class="sd">    &quot;&quot;&quot;</span>    
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">ws</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">V</span> <span class="o">=</span> <span class="p">{}</span>    
+        
+        <span class="k">return</span>
+    
+<div class="viewcode-block" id="V_data.Encode">
+<a class="viewcode-back" href="../../documentation.html#pyRET.data_classes.V_data.Encode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">Encode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Jsonize the data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">Encoded</span> <span class="o">=</span> <span class="p">{}</span>
+        
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;Class&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">})</span>
+        
+        <span class="n">ws</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">absorber</span><span class="p">,</span> <span class="n">item1</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ws</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">ws</span><span class="p">[</span><span class="n">absorber</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">emitter</span><span class="p">,</span> <span class="n">item2</span> <span class="ow">in</span> <span class="n">item1</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">ws</span><span class="p">[</span><span class="n">absorber</span><span class="p">][</span><span class="n">emitter</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">item2</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">item2</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()]</span>
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;ws&quot;</span><span class="p">:</span> <span class="n">ws</span><span class="p">})</span>
+        
+        
+        
+        <span class="n">V</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">absorber</span><span class="p">,</span> <span class="n">item1</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">V</span><span class="p">[</span><span class="n">absorber</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">emitter</span><span class="p">,</span> <span class="n">item2</span> <span class="ow">in</span> <span class="n">item1</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">V</span><span class="p">[</span><span class="n">absorber</span><span class="p">][</span><span class="n">emitter</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">transition</span><span class="p">,</span> <span class="n">item3</span> <span class="ow">in</span> <span class="n">item2</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">V</span><span class="p">[</span><span class="n">absorber</span><span class="p">][</span><span class="n">emitter</span><span class="p">][</span><span class="n">transition</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="k">for</span> <span class="n">L</span><span class="p">,</span> <span class="n">item4</span> <span class="ow">in</span> <span class="n">item3</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="n">V</span><span class="p">[</span><span class="n">absorber</span><span class="p">][</span><span class="n">emitter</span><span class="p">][</span><span class="n">transition</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">L</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                        <span class="k">for</span> <span class="n">M</span><span class="p">,</span> <span class="n">item5</span> <span class="ow">in</span> <span class="n">item4</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                            <span class="n">V</span><span class="p">[</span><span class="n">absorber</span><span class="p">][</span><span class="n">emitter</span><span class="p">][</span><span class="n">transition</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">L</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">M</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                            <span class="k">for</span> <span class="n">P</span><span class="p">,</span> <span class="n">item6</span> <span class="ow">in</span> <span class="n">item5</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                                <span class="n">V</span><span class="p">[</span><span class="n">absorber</span><span class="p">][</span><span class="n">emitter</span><span class="p">][</span><span class="n">transition</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">L</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">M</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">P</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> \
+                                <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">item6</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">item6</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()]</span>
+        
+        <span class="n">Encoded</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;V&quot;</span><span class="p">:</span> <span class="n">V</span><span class="p">})</span>
+        
+        <span class="k">return</span> <span class="n">Encoded</span></div>
+
+
+<div class="viewcode-block" id="V_data.Decode">
+<a class="viewcode-back" href="../../documentation.html#pyRET.data_classes.V_data.Decode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">Decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load data from a jsonized form.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;Class&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span>
+            <span class="n">clsname</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;Class&quot;</span><span class="p">]</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">clsname</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The json objeect was from </span><span class="si">{</span><span class="n">clsname</span><span class="si">}</span><span class="s2"> class, but is being decoded by&quot;</span><span class="o">+</span>
+            <span class="sa">f</span><span class="s2">&quot;the decoder of the class </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            
+        <span class="n">ws</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">absorber</span><span class="p">,</span> <span class="n">item1</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;ws&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">ws</span><span class="p">[</span><span class="n">absorber</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">emitter</span><span class="p">,</span> <span class="n">item2</span> <span class="ow">in</span> <span class="n">item1</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">ws</span><span class="p">[</span><span class="n">absorber</span><span class="p">][</span><span class="n">emitter</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">item2</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">item2</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ws</span> <span class="o">=</span> <span class="n">ws</span>
+        
+        <span class="n">V</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">absorber</span><span class="p">,</span> <span class="n">item1</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;V&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">V</span><span class="p">[</span><span class="n">absorber</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">emitter</span><span class="p">,</span> <span class="n">item2</span> <span class="ow">in</span> <span class="n">item1</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">V</span><span class="p">[</span><span class="n">absorber</span><span class="p">][</span><span class="n">emitter</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">transition</span><span class="p">,</span> <span class="n">item3</span> <span class="ow">in</span> <span class="n">item2</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">V</span><span class="p">[</span><span class="n">absorber</span><span class="p">][</span><span class="n">emitter</span><span class="p">][</span><span class="n">transition</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="k">for</span> <span class="n">strL</span><span class="p">,</span> <span class="n">item4</span> <span class="ow">in</span> <span class="n">item3</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="n">L</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">strL</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+                        <span class="n">V</span><span class="p">[</span><span class="n">absorber</span><span class="p">][</span><span class="n">emitter</span><span class="p">][</span><span class="n">transition</span><span class="p">][</span><span class="n">L</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                        <span class="k">for</span> <span class="n">strM</span><span class="p">,</span> <span class="n">item5</span> <span class="ow">in</span> <span class="n">item4</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                            <span class="n">M</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">strM</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+                            <span class="n">V</span><span class="p">[</span><span class="n">absorber</span><span class="p">][</span><span class="n">emitter</span><span class="p">][</span><span class="n">transition</span><span class="p">][</span><span class="n">L</span><span class="p">][</span><span class="n">M</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                            <span class="k">for</span> <span class="n">strP</span><span class="p">,</span> <span class="n">item6</span> <span class="ow">in</span> <span class="n">item5</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                                <span class="n">P</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">strP</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+                                <span class="n">V</span><span class="p">[</span><span class="n">absorber</span><span class="p">][</span><span class="n">emitter</span><span class="p">][</span><span class="n">transition</span><span class="p">][</span><span class="n">L</span><span class="p">][</span><span class="n">M</span><span class="p">][</span><span class="n">P</span><span class="p">]</span> <span class="o">=</span> \
+                                <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">item6</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">item6</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">V</span> <span class="o">=</span> <span class="n">V</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+</div>
+
+        
+       
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, University of Chicago and Argonne National Laboratory.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

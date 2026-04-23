@@ -1,0 +1,1649 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Documentation &mdash; PyRET  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Tutorial" href="tutorial.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            PyRET
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-pyRET.run.main">Matrix element computation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pyRET.multipole_scalar_angular">Toolkit to define photon modes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pyRET.multipole_scalar_angular.MP_SA"><code class="docutils literal notranslate"><span class="pre">MP_SA</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.multipole_scalar_angular.MP_SA.C"><code class="docutils literal notranslate"><span class="pre">MP_SA.C</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.multipole_scalar_angular.MP_SA.lmax"><code class="docutils literal notranslate"><span class="pre">MP_SA.lmax</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRET.multipole_vector_angular.MP_VA"><code class="docutils literal notranslate"><span class="pre">MP_VA</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.multipole_vector_angular.MP_VA.C"><code class="docutils literal notranslate"><span class="pre">MP_VA.C</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.multipole_vector_angular.MP_VA.jmax"><code class="docutils literal notranslate"><span class="pre">MP_VA.jmax</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.multipole_vector_angular.MP_VA.absMP"><code class="docutils literal notranslate"><span class="pre">MP_VA.absMP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.multipole_vector_angular.MP_VA.decompose"><code class="docutils literal notranslate"><span class="pre">MP_VA.decompose()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.multipole_vector_angular.MP_VA.fromvector"><code class="docutils literal notranslate"><span class="pre">MP_VA.fromvector()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.multipole_vector_angular.MP_VA.plotamp"><code class="docutils literal notranslate"><span class="pre">MP_VA.plotamp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.multipole_vector_angular.MP_VA.scale"><code class="docutils literal notranslate"><span class="pre">MP_VA.scale()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.multipole_vector_angular.MP_VA.toMP_VA_Hansen"><code class="docutils literal notranslate"><span class="pre">MP_VA.toMP_VA_Hansen()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.multipole_vector_angular.MP_VA.vector"><code class="docutils literal notranslate"><span class="pre">MP_VA.vector()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRET.multipole_vector_angular.MP_VA_Hansen"><code class="docutils literal notranslate"><span class="pre">MP_VA_Hansen</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.multipole_vector_angular.MP_VA_Hansen.C"><code class="docutils literal notranslate"><span class="pre">MP_VA_Hansen.C</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.multipole_vector_angular.MP_VA_Hansen.jmax"><code class="docutils literal notranslate"><span class="pre">MP_VA_Hansen.jmax</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRET.multipole_vector_angular.addMP_VA"><code class="docutils literal notranslate"><span class="pre">addMP_VA()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRET.multipole_vector_angular.addMP_VA_Hansen"><code class="docutils literal notranslate"><span class="pre">addMP_VA_Hansen()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRET.fields.SField"><code class="docutils literal notranslate"><span class="pre">SField</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.fields.SField.origin"><code class="docutils literal notranslate"><span class="pre">SField.origin</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.fields.SField.ks"><code class="docutils literal notranslate"><span class="pre">SField.ks</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.fields.SField.mps"><code class="docutils literal notranslate"><span class="pre">SField.mps</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.fields.SField.rfuns"><code class="docutils literal notranslate"><span class="pre">SField.rfuns</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.fields.SField.Decode"><code class="docutils literal notranslate"><span class="pre">SField.Decode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.fields.SField.Encode"><code class="docutils literal notranslate"><span class="pre">SField.Encode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.fields.SField.add_component"><code class="docutils literal notranslate"><span class="pre">SField.add_component()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.fields.SField.scale"><code class="docutils literal notranslate"><span class="pre">SField.scale()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.fields.SField.torgrid"><code class="docutils literal notranslate"><span class="pre">SField.torgrid()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRET.fields.VField"><code class="docutils literal notranslate"><span class="pre">VField</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.fields.VField.origin"><code class="docutils literal notranslate"><span class="pre">VField.origin</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.fields.VField.ks"><code class="docutils literal notranslate"><span class="pre">VField.ks</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.fields.VField.mpvs"><code class="docutils literal notranslate"><span class="pre">VField.mpvs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.fields.VField.rfuns"><code class="docutils literal notranslate"><span class="pre">VField.rfuns</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.fields.VField.Decode"><code class="docutils literal notranslate"><span class="pre">VField.Decode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.fields.VField.Encode"><code class="docutils literal notranslate"><span class="pre">VField.Encode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.fields.VField.Farfield"><code class="docutils literal notranslate"><span class="pre">VField.Farfield()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.fields.VField.add_component"><code class="docutils literal notranslate"><span class="pre">VField.add_component()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.fields.VField.scale"><code class="docutils literal notranslate"><span class="pre">VField.scale()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.fields.VField.torgrid"><code class="docutils literal notranslate"><span class="pre">VField.torgrid()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRET.fields.curl"><code class="docutils literal notranslate"><span class="pre">curl()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRET.fields.divergence"><code class="docutils literal notranslate"><span class="pre">divergence()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRET.fields.gradient"><code class="docutils literal notranslate"><span class="pre">gradient()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRET.emfieldtools.InitializeMultipole"><code class="docutils literal notranslate"><span class="pre">InitializeMultipole()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRET.emfieldtools.getEHfromA"><code class="docutils literal notranslate"><span class="pre">getEHfromA()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pyRET.wavefunctions">Toolkit to define wavefunctions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pyRET.wavefunctions.WFunction"><code class="docutils literal notranslate"><span class="pre">WFunction</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.wavefunctions.WFunction.isGamma"><code class="docutils literal notranslate"><span class="pre">WFunction.isGamma</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.wavefunctions.WFunction.Gs"><code class="docutils literal notranslate"><span class="pre">WFunction.Gs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.wavefunctions.WFunction.evcCs"><code class="docutils literal notranslate"><span class="pre">WFunction.evcCs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.wavefunctions.WFunction.NG"><code class="docutils literal notranslate"><span class="pre">WFunction.NG</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.wavefunctions.WFunction.isplanewave"><code class="docutils literal notranslate"><span class="pre">WFunction.isplanewave</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.wavefunctions.WFunction.MPField"><code class="docutils literal notranslate"><span class="pre">WFunction.MPField</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.wavefunctions.WFunction.__init__"><code class="docutils literal notranslate"><span class="pre">WFunction.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.wavefunctions.WFunction.Encode"><code class="docutils literal notranslate"><span class="pre">WFunction.Encode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.wavefunctions.WFunction.Decode"><code class="docutils literal notranslate"><span class="pre">WFunction.Decode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.wavefunctions.WFunction.readfromhdf5"><code class="docutils literal notranslate"><span class="pre">WFunction.readfromhdf5()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.wavefunctions.WFunction.readfromhdf5_parallel"><code class="docutils literal notranslate"><span class="pre">WFunction.readfromhdf5_parallel()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.wavefunctions.WFunction.torgrid"><code class="docutils literal notranslate"><span class="pre">WFunction.torgrid()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.wavefunctions.WFunction.getharmonics"><code class="docutils literal notranslate"><span class="pre">WFunction.getharmonics()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.wavefunctions.WFunction.scale"><code class="docutils literal notranslate"><span class="pre">WFunction.scale()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.wavefunctions.WFunction.copy"><code class="docutils literal notranslate"><span class="pre">WFunction.copy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">WFunction.copy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id2"><code class="docutils literal notranslate"><span class="pre">WFunction.getharmonics()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.wavefunctions.WFunction.kpsitorgrid"><code class="docutils literal notranslate"><span class="pre">WFunction.kpsitorgrid()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.wavefunctions.WFunction.readfromdat"><code class="docutils literal notranslate"><span class="pre">WFunction.readfromdat()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id3"><code class="docutils literal notranslate"><span class="pre">WFunction.readfromhdf5()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id4"><code class="docutils literal notranslate"><span class="pre">WFunction.readfromhdf5_parallel()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id5"><code class="docutils literal notranslate"><span class="pre">WFunction.torgrid()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pyRET.Vtools">Toolkit to calculate the matrix elements</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pyRET.Vtools.V12"><code class="docutils literal notranslate"><span class="pre">V12()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRET.Vtools.V12_ED"><code class="docutils literal notranslate"><span class="pre">V12_ED()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRET.Vtools.V12_MD"><code class="docutils literal notranslate"><span class="pre">V12_MD()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRET.Vtools.V12_par"><code class="docutils literal notranslate"><span class="pre">V12_par()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRET.Vtools.Veded"><code class="docutils literal notranslate"><span class="pre">Veded()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRET.Vtools.computeV"><code class="docutils literal notranslate"><span class="pre">computeV()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRET.Vtools.hasWF"><code class="docutils literal notranslate"><span class="pre">hasWF()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRET.Vtools.whichWF"><code class="docutils literal notranslate"><span class="pre">whichWF()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pyRET.data_classes">Data classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pyRET.data_classes.Emitters_data"><code class="docutils literal notranslate"><span class="pre">Emitters_data</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.Emitters_data.EmType"><code class="docutils literal notranslate"><span class="pre">Emitters_data.EmType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.Emitters_data.T1"><code class="docutils literal notranslate"><span class="pre">Emitters_data.T1</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.Emitters_data.w"><code class="docutils literal notranslate"><span class="pre">Emitters_data.w</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.Emitters_data.k"><code class="docutils literal notranslate"><span class="pre">Emitters_data.k</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.Emitters_data.nIndex"><code class="docutils literal notranslate"><span class="pre">Emitters_data.nIndex</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.Emitters_data.pMPs"><code class="docutils literal notranslate"><span class="pre">Emitters_data.pMPs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.Emitters_data.Decode"><code class="docutils literal notranslate"><span class="pre">Emitters_data.Decode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.Emitters_data.Encode"><code class="docutils literal notranslate"><span class="pre">Emitters_data.Encode()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRET.data_classes.Positions_data"><code class="docutils literal notranslate"><span class="pre">Positions_data</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.Positions_data.Rs"><code class="docutils literal notranslate"><span class="pre">Positions_data.Rs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.Positions_data.Ts"><code class="docutils literal notranslate"><span class="pre">Positions_data.Ts</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.Positions_data.Ps"><code class="docutils literal notranslate"><span class="pre">Positions_data.Ps</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.Positions_data.Rg"><code class="docutils literal notranslate"><span class="pre">Positions_data.Rg</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.Positions_data.Tg"><code class="docutils literal notranslate"><span class="pre">Positions_data.Tg</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.Positions_data.Pg"><code class="docutils literal notranslate"><span class="pre">Positions_data.Pg</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.Positions_data.Rvects"><code class="docutils literal notranslate"><span class="pre">Positions_data.Rvects</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.Positions_data.Decode"><code class="docutils literal notranslate"><span class="pre">Positions_data.Decode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.Positions_data.Encode"><code class="docutils literal notranslate"><span class="pre">Positions_data.Encode()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRET.data_classes.Positions_data_1config"><code class="docutils literal notranslate"><span class="pre">Positions_data_1config</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.Positions_data_1config.Rs"><code class="docutils literal notranslate"><span class="pre">Positions_data_1config.Rs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.Positions_data_1config.Ts"><code class="docutils literal notranslate"><span class="pre">Positions_data_1config.Ts</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.Positions_data_1config.Ps"><code class="docutils literal notranslate"><span class="pre">Positions_data_1config.Ps</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.Positions_data_1config.Rvects"><code class="docutils literal notranslate"><span class="pre">Positions_data_1config.Rvects</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.Positions_data_1config.Decode"><code class="docutils literal notranslate"><span class="pre">Positions_data_1config.Decode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.Positions_data_1config.Encode"><code class="docutils literal notranslate"><span class="pre">Positions_data_1config.Encode()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRET.data_classes.V_data"><code class="docutils literal notranslate"><span class="pre">V_data</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.V_data.ws"><code class="docutils literal notranslate"><span class="pre">V_data.ws</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.V_data.V"><code class="docutils literal notranslate"><span class="pre">V_data.V</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.V_data.Decode"><code class="docutils literal notranslate"><span class="pre">V_data.Decode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.V_data.Encode"><code class="docutils literal notranslate"><span class="pre">V_data.Encode()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyRET.data_classes.WFunctions_data"><code class="docutils literal notranslate"><span class="pre">WFunctions_data</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.WFunctions_data.emitterTypes"><code class="docutils literal notranslate"><span class="pre">WFunctions_data.emitterTypes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.WFunctions_data.states"><code class="docutils literal notranslate"><span class="pre">WFunctions_data.states</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.WFunctions_data.iKSs"><code class="docutils literal notranslate"><span class="pre">WFunctions_data.iKSs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.WFunctions_data.rgridwf"><code class="docutils literal notranslate"><span class="pre">WFunctions_data.rgridwf</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.WFunctions_data.Ns"><code class="docutils literal notranslate"><span class="pre">WFunctions_data.Ns</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.WFunctions_data.pwout"><code class="docutils literal notranslate"><span class="pre">WFunctions_data.pwout</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.WFunctions_data.wfs"><code class="docutils literal notranslate"><span class="pre">WFunctions_data.wfs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.WFunctions_data.kwfs"><code class="docutils literal notranslate"><span class="pre">WFunctions_data.kwfs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.WFunctions_data.wfrs"><code class="docutils literal notranslate"><span class="pre">WFunctions_data.wfrs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.WFunctions_data.kwfrs"><code class="docutils literal notranslate"><span class="pre">WFunctions_data.kwfrs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.WFunctions_data.Decode"><code class="docutils literal notranslate"><span class="pre">WFunctions_data.Decode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyRET.data_classes.WFunctions_data.Encode"><code class="docutils literal notranslate"><span class="pre">WFunctions_data.Encode()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="credits.html">Credits</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">PyRET</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Documentation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/documentation.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="documentation">
+<span id="id1"></span><h1>Documentation<a class="headerlink" href="#documentation" title="Link to this heading"></a></h1>
+<section id="module-pyRET.run.main">
+<span id="matrix-element-computation"></span><h2>Matrix element computation<a class="headerlink" href="#module-pyRET.run.main" title="Link to this heading"></a></h2>
+</section>
+<section id="module-pyRET.multipole_scalar_angular">
+<span id="toolkit-to-define-photon-modes"></span><h2>Toolkit to define photon modes<a class="headerlink" href="#module-pyRET.multipole_scalar_angular" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyRET.multipole_scalar_angular.MP_SA">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyRET.multipole_scalar_angular.</span></span><span class="sig-name descname"><span class="pre">MP_SA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lmax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/multipole_scalar_angular.html#MP_SA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.multipole_scalar_angular.MP_SA" title="Link to this definition"></a></dt>
+<dd><p>Class representing Scalar Multipole in angular coordinates</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.multipole_scalar_angular.MP_SA.C">
+<span class="sig-name descname"><span class="pre">C</span></span><a class="headerlink" href="#pyRET.multipole_scalar_angular.MP_SA.C" title="Link to this definition"></a></dt>
+<dd><p>Dictionary containing multipole coefficients. C[l][m] is the coefficient of the multipole with angular momentum l and m.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.multipole_scalar_angular.MP_SA.lmax">
+<span class="sig-name descname"><span class="pre">lmax</span></span><a class="headerlink" href="#pyRET.multipole_scalar_angular.MP_SA.lmax" title="Link to this definition"></a></dt>
+<dd><p>integer value of max angular momentum. Here l = 0,1,2,…,lmax. m = -l, -l+1,…,l-1,l</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class" id="module-pyRET.multipole_vector_angular">
+<dt class="sig sig-object py" id="pyRET.multipole_vector_angular.MP_VA">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyRET.multipole_vector_angular.</span></span><span class="sig-name descname"><span class="pre">MP_VA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">jmax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/multipole_vector_angular.html#MP_VA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.multipole_vector_angular.MP_VA" title="Link to this definition"></a></dt>
+<dd><p>Class representing Vector Multipole in angular coordinates with definite l values (j = Total angular momentum, l = orbital angular momentum, M = projected total angular momentum)</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.multipole_vector_angular.MP_VA.C">
+<span class="sig-name descname"><span class="pre">C</span></span><a class="headerlink" href="#pyRET.multipole_vector_angular.MP_VA.C" title="Link to this definition"></a></dt>
+<dd><p>Dictionary containing multupole coefficients C[j][l][M]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict of dict of dict of complex</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.multipole_vector_angular.MP_VA.jmax">
+<span class="sig-name descname"><span class="pre">jmax</span></span><a class="headerlink" href="#pyRET.multipole_vector_angular.MP_VA.jmax" title="Link to this definition"></a></dt>
+<dd><p>integer value of max angular momentum</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.multipole_vector_angular.MP_VA.absMP">
+<span class="sig-name descname"><span class="pre">absMP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/multipole_vector_angular.html#MP_VA.absMP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.multipole_vector_angular.MP_VA.absMP" title="Link to this definition"></a></dt>
+<dd><p>Absolute magnitude of sum of all (or specific angular components)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>func</strong> (<em>callable</em>) – A function that takes (j, l, M) and returns True if the component should be included.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.multipole_vector_angular.MP_VA.decompose">
+<span class="sig-name descname"><span class="pre">decompose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">V</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtheta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dphi</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/multipole_vector_angular.html#MP_VA.decompose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.multipole_vector_angular.MP_VA.decompose" title="Link to this definition"></a></dt>
+<dd><p>Multipole decomposition of a given vector field
+:param V: Vector field over angular coordinates theta and phi. The first dimension is the vector component (r, theta, phi)
+:type V: array of shape (3, Ntheta, Nphi)
+:param theta: Theta coordinates
+:type theta: array of shape (Ntheta, Nphi)
+:param phi: Phi coordinates
+:type phi: array of shape (Ntheta, Nphi)
+:param dtheta: step size in theta
+:type dtheta: float
+:param dphi: step size in phi
+:type dphi: float</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.multipole_vector_angular.MP_VA.fromvector">
+<span class="sig-name descname"><span class="pre">fromvector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">V</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/multipole_vector_angular.html#MP_VA.fromvector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.multipole_vector_angular.MP_VA.fromvector" title="Link to this definition"></a></dt>
+<dd><p>Get the object from a given complex vector.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.multipole_vector_angular.MP_VA.plotamp">
+<span class="sig-name descname"><span class="pre">plotamp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/multipole_vector_angular.html#MP_VA.plotamp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.multipole_vector_angular.MP_VA.plotamp" title="Link to this definition"></a></dt>
+<dd><p>Plot the multipole coefficients of vector multipoles</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.multipole_vector_angular.MP_VA.scale">
+<span class="sig-name descname"><span class="pre">scale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">factor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/multipole_vector_angular.html#MP_VA.scale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.multipole_vector_angular.MP_VA.scale" title="Link to this definition"></a></dt>
+<dd><p>Scale all the coefficients with a specific constant (complex) factor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>factor</strong> (<em>complex</em>) – The scaling factor.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.multipole_vector_angular.MP_VA.toMP_VA_Hansen">
+<span class="sig-name descname"><span class="pre">toMP_VA_Hansen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/multipole_vector_angular.html#MP_VA.toMP_VA_Hansen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.multipole_vector_angular.MP_VA.toMP_VA_Hansen" title="Link to this definition"></a></dt>
+<dd><p>Transfer the MP_VA class object to the MP_VA_Hansen object.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.multipole_vector_angular.MP_VA.vector">
+<span class="sig-name descname"><span class="pre">vector</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/multipole_vector_angular.html#MP_VA.vector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.multipole_vector_angular.MP_VA.vector" title="Link to this definition"></a></dt>
+<dd><p>Transform the multipole coefficients in vector form.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyRET.multipole_vector_angular.MP_VA_Hansen">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyRET.multipole_vector_angular.</span></span><span class="sig-name descname"><span class="pre">MP_VA_Hansen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">jmax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/multipole_vector_angular.html#MP_VA_Hansen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.multipole_vector_angular.MP_VA_Hansen" title="Link to this definition"></a></dt>
+<dd><p>Class representing Hansen Vector Multipole (Angular only) in j , M basis
+(j = Total angular momentum, M = projected total angular momentum, lam = a parameter to determine which mode– longitudinal(-1), and two transverse (0, 1)</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.multipole_vector_angular.MP_VA_Hansen.C">
+<span class="sig-name descname"><span class="pre">C</span></span><a class="headerlink" href="#pyRET.multipole_vector_angular.MP_VA_Hansen.C" title="Link to this definition"></a></dt>
+<dd><p>Dictionary containing multupole coefficients C[j][M][lam]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict of dict of dict of complex</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.multipole_vector_angular.MP_VA_Hansen.jmax">
+<span class="sig-name descname"><span class="pre">jmax</span></span><a class="headerlink" href="#pyRET.multipole_vector_angular.MP_VA_Hansen.jmax" title="Link to this definition"></a></dt>
+<dd><p>integer value of max angular momentum</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRET.multipole_vector_angular.addMP_VA">
+<span class="sig-prename descclassname"><span class="pre">pyRET.multipole_vector_angular.</span></span><span class="sig-name descname"><span class="pre">addMP_VA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mps</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/multipole_vector_angular.html#addMP_VA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.multipole_vector_angular.addMP_VA" title="Link to this definition"></a></dt>
+<dd><p>Helper function to add vector multipoles in a list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mps</strong> (<em>list</em><em> of </em><a class="reference internal" href="#pyRET.multipole_vector_angular.MP_VA" title="pyRET.multipole_vector_angular.MP_VA"><em>MP_VA</em></a>) – list of MP_VA objects to be added together</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>combined MP_VA object</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#pyRET.multipole_vector_angular.MP_VA" title="pyRET.multipole_vector_angular.MP_VA">MP_VA</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRET.multipole_vector_angular.addMP_VA_Hansen">
+<span class="sig-prename descclassname"><span class="pre">pyRET.multipole_vector_angular.</span></span><span class="sig-name descname"><span class="pre">addMP_VA_Hansen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mps</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/multipole_vector_angular.html#addMP_VA_Hansen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.multipole_vector_angular.addMP_VA_Hansen" title="Link to this definition"></a></dt>
+<dd><p>Helper function to add Hansen vector multipoles in a list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mps</strong> (<em>list</em><em> of </em><a class="reference internal" href="#pyRET.multipole_vector_angular.MP_VA_Hansen" title="pyRET.multipole_vector_angular.MP_VA_Hansen"><em>MP_VA_Hansen</em></a>) – list of MP_VA_Hansen objects</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>combined MP_VA_Hansen object</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#pyRET.multipole_vector_angular.MP_VA_Hansen" title="pyRET.multipole_vector_angular.MP_VA_Hansen">MP_VA_Hansen</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class" id="module-pyRET.fields">
+<dt class="sig sig-object py" id="pyRET.fields.SField">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyRET.fields.</span></span><span class="sig-name descname"><span class="pre">SField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">origin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">array([0.,</span> <span class="pre">0.,</span> <span class="pre">0.])</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/fields.html#SField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.fields.SField" title="Link to this definition"></a></dt>
+<dd><p>Class representing a Scalar Multipolar Field. This class contains a multipolar scalar field that is stored as a sum of
+various multipolar components, each with specific value of wavevectors and radial functions. The multipolar (angular) components are stored as MP_SA objects</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.fields.SField.origin">
+<span class="sig-name descname"><span class="pre">origin</span></span><a class="headerlink" href="#pyRET.fields.SField.origin" title="Link to this definition"></a></dt>
+<dd><p>coordinates of the center.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray of shape (3,)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.fields.SField.ks">
+<span class="sig-name descname"><span class="pre">ks</span></span><a class="headerlink" href="#pyRET.fields.SField.ks" title="Link to this definition"></a></dt>
+<dd><p>list of radial wavevectors corresponding to different components</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.fields.SField.mps">
+<span class="sig-name descname"><span class="pre">mps</span></span><a class="headerlink" href="#pyRET.fields.SField.mps" title="Link to this definition"></a></dt>
+<dd><p>list of multipoles (MP_SA)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of <a class="reference internal" href="#pyRET.multipole_scalar_angular.MP_SA" title="pyRET.multipole_scalar_angular.MP_SA">MP_SA</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.fields.SField.rfuns">
+<span class="sig-name descname"><span class="pre">rfuns</span></span><a class="headerlink" href="#pyRET.fields.SField.rfuns" title="Link to this definition"></a></dt>
+<dd><p>list of dictionary containing information on the radial function.
+must contain the key “type” = “J” or “H1” or “Atomic”
+optional keys: “order”, “n”,”Z” etc etc.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.fields.SField.Decode">
+<span class="sig-name descname"><span class="pre">Decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/fields.html#SField.Decode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.fields.SField.Decode" title="Link to this definition"></a></dt>
+<dd><p>Decodes the SField object from a json dictionary.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.fields.SField.Encode">
+<span class="sig-name descname"><span class="pre">Encode</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/fields.html#SField.Encode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.fields.SField.Encode" title="Link to this definition"></a></dt>
+<dd><p>Encodes the SField object to a jsonizable dictionary. The multipoles are encoded using their own Encode() method.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.fields.SField.add_component">
+<span class="sig-name descname"><span class="pre">add_component</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kval</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lmax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rfun</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/fields.html#SField.add_component"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.fields.SField.add_component" title="Link to this definition"></a></dt>
+<dd><p>Adds a component- one multipole mode with specific rfunc and specific value of the wavevector with specificed combination of multipoles</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kval</strong> (<em>float</em>) – value of the wavevector in 2pi/Angstrom unit</p></li>
+<li><p><strong>lmax</strong> (<em>int</em>) – maximum order of the multipole</p></li>
+<li><p><strong>rfun</strong> (<em>dict</em>) – dictionary containing information on the radial function</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.fields.SField.scale">
+<span class="sig-name descname"><span class="pre">scale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">factor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/fields.html#SField.scale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.fields.SField.scale" title="Link to this definition"></a></dt>
+<dd><p>Scalar multiplication.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.fields.SField.torgrid">
+<span class="sig-name descname"><span class="pre">torgrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgrid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/fields.html#SField.torgrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.fields.SField.torgrid" title="Link to this definition"></a></dt>
+<dd><p>Project the scalar field in a position grid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>rgrid</strong> (<em>np.ndarray</em><em> of </em><em>shape</em><em> (</em><em>3</em><em>, </em><em>N1</em><em>, </em><em>N2</em><em>, </em><em>..</em><em>)</em>) – position grid where the field needs to be evaluated.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>scalar field evaluated at the positions specified by rgrid.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>S (np.ndarray of shape (N1, N2, ..))</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyRET.fields.VField">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyRET.fields.</span></span><span class="sig-name descname"><span class="pre">VField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">origin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">array([0.,</span> <span class="pre">0.,</span> <span class="pre">0.])</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/fields.html#VField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.fields.VField" title="Link to this definition"></a></dt>
+<dd><p>Class representing a Vector Field. This class contains a multipolar vector field that is stored as a sum of
+various multipolar components, each with specific value of wavevectors and radial functions.
+The multipolar (angular) components are stored as MP_VA or MP_VA_Hansen objects</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.fields.VField.origin">
+<span class="sig-name descname"><span class="pre">origin</span></span><a class="headerlink" href="#pyRET.fields.VField.origin" title="Link to this definition"></a></dt>
+<dd><p>origin of the field</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray of shape (3,)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.fields.VField.ks">
+<span class="sig-name descname"><span class="pre">ks</span></span><a class="headerlink" href="#pyRET.fields.VField.ks" title="Link to this definition"></a></dt>
+<dd><p>list of radial wavevectors corresponding to different components</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.fields.VField.mpvs">
+<span class="sig-name descname"><span class="pre">mpvs</span></span><a class="headerlink" href="#pyRET.fields.VField.mpvs" title="Link to this definition"></a></dt>
+<dd><p>list of multipoles (MP_VA or MP_VA_Hansen)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of <a class="reference internal" href="#pyRET.multipole_vector_angular.MP_VA" title="pyRET.multipole_vector_angular.MP_VA">MP_VA</a> or <a class="reference internal" href="#pyRET.multipole_vector_angular.MP_VA_Hansen" title="pyRET.multipole_vector_angular.MP_VA_Hansen">MP_VA_Hansen</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.fields.VField.rfuns">
+<span class="sig-name descname"><span class="pre">rfuns</span></span><a class="headerlink" href="#pyRET.fields.VField.rfuns" title="Link to this definition"></a></dt>
+<dd><p>list of dictionary containing information on the radial function.
+must contain the key “type” = “J” or “H1” or “Atomic”
+optional keys: “order”, “n”,”Z” etc etc.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.fields.VField.Decode">
+<span class="sig-name descname"><span class="pre">Decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/fields.html#VField.Decode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.fields.VField.Decode" title="Link to this definition"></a></dt>
+<dd><p>Decodes the VField object from a jsonizable dictionary. The multipoles are decoded using their own Decode() method.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.fields.VField.Encode">
+<span class="sig-name descname"><span class="pre">Encode</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/fields.html#VField.Encode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.fields.VField.Encode" title="Link to this definition"></a></dt>
+<dd><p>Encodes the VField object to a jsonizable dictionary. The multipoles are encoded using their own Encode() method.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.fields.VField.Farfield">
+<span class="sig-name descname"><span class="pre">Farfield</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/fields.html#VField.Farfield"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.fields.VField.Farfield" title="Link to this definition"></a></dt>
+<dd><p>Calculates the far field distribution of the vector field on a theta and phi grid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>theta</strong> (<em>np.ndarray</em><em> of </em><em>shape</em><em> (</em><em>N1</em><em>, </em><em>N2</em><em>, </em><em>...</em><em>)</em>) – polar angle grid</p></li>
+<li><p><strong>phi</strong> (<em>np.ndarray</em><em> of </em><em>shape</em><em> (</em><em>N1</em><em>, </em><em>N2</em><em>, </em><em>...</em><em>)</em>) – azimuthal angle grid</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>far field vector field evaluated at the angles specified by theta and phi.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#pyRET.data_classes.V_data.V" title="pyRET.data_classes.V_data.V">V</a> (np.ndarray of shape (3, N1, N2, ..))</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.fields.VField.add_component">
+<span class="sig-name descname"><span class="pre">add_component</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kval</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jmax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rfun</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isHansen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/fields.html#VField.add_component"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.fields.VField.add_component" title="Link to this definition"></a></dt>
+<dd><p>Add a component. One multipole mode with specific rfunc and specific value of the wavevector with specificed combination of multipoles. The multipoles are initialized to zero and need to be filled in separately.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kval</strong> (<em>float</em>) – value of the wavevector in 2pi/Angstrom unit</p></li>
+<li><p><strong>jmax</strong> (<em>int</em>) – maximum order of the multipole</p></li>
+<li><p><strong>rfun</strong> (<em>dict</em>) – dictionary containing information on the radial function
+must contain the key “type” = “J” or “H1” or “Atomic”
+optional keys: “order”, “n”,”Z” etc etc.
+isHansen(bool): whether the multipole is Hansen type or not. If True, the multipole will be initialized as MP_VA_Hansen, else it will be initialized as MP_VA.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.fields.VField.scale">
+<span class="sig-name descname"><span class="pre">scale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">factor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/fields.html#VField.scale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.fields.VField.scale" title="Link to this definition"></a></dt>
+<dd><p>Scalar multiplication.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.fields.VField.torgrid">
+<span class="sig-name descname"><span class="pre">torgrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgrid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/fields.html#VField.torgrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.fields.VField.torgrid" title="Link to this definition"></a></dt>
+<dd><p>Project the vector field in a position grid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>rgrid</strong> (<em>np.ndarray</em><em> of </em><em>shape</em><em> (</em><em>3</em><em>, </em><em>N1</em><em>, </em><em>N2</em><em>, </em><em>..</em><em>)</em>) – position grid where the field needs to be evaluated.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>vector field evaluated at the positions specified by rgrid.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#pyRET.data_classes.V_data.V" title="pyRET.data_classes.V_data.V">V</a> (np.ndarray of shape (3, N1, N2, ..))</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRET.fields.curl">
+<span class="sig-prename descclassname"><span class="pre">pyRET.fields.</span></span><span class="sig-name descname"><span class="pre">curl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">V</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/fields.html#curl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.fields.curl" title="Link to this definition"></a></dt>
+<dd><p>Computes curl of a vector field. Only applicable for rfun{“order”} = None or l; and rfun[“type”] = “J” or “H1”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>V</strong> (<a class="reference internal" href="#pyRET.fields.VField" title="pyRET.fields.VField"><em>VField</em></a>) – Vector field</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Curl of the vector field</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Vc (<a class="reference internal" href="#pyRET.fields.VField" title="pyRET.fields.VField">VField</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRET.fields.divergence">
+<span class="sig-prename descclassname"><span class="pre">pyRET.fields.</span></span><span class="sig-name descname"><span class="pre">divergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">V</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/fields.html#divergence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.fields.divergence" title="Link to this definition"></a></dt>
+<dd><p>Computes divergence of a vector field. Only applicable for rfun{“order”} = None or l; and rfun[“type”] = “J” or “H1”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>V</strong> (<a class="reference internal" href="#pyRET.fields.VField" title="pyRET.fields.VField"><em>VField</em></a>) – Vector field</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Divergence of the vector field</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>S (<a class="reference internal" href="#pyRET.fields.SField" title="pyRET.fields.SField">SField</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRET.fields.gradient">
+<span class="sig-prename descclassname"><span class="pre">pyRET.fields.</span></span><span class="sig-name descname"><span class="pre">gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/fields.html#gradient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.fields.gradient" title="Link to this definition"></a></dt>
+<dd><p>Computes gradient of a scalar field. Only applicable for rfun{“order”} = None or l; and rfun[“type”] = “J” or “H1”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>S</strong> (<a class="reference internal" href="#pyRET.fields.SField" title="pyRET.fields.SField"><em>SField</em></a>) – Scalar field</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Gradient of the scalar field</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#pyRET.data_classes.V_data.V" title="pyRET.data_classes.V_data.V">V</a> (<a class="reference internal" href="#pyRET.fields.VField" title="pyRET.fields.VField">VField</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function" id="module-pyRET.emfieldtools">
+<dt class="sig sig-object py" id="pyRET.emfieldtools.InitializeMultipole">
+<span class="sig-prename descclassname"><span class="pre">pyRET.emfieldtools.</span></span><span class="sig-name descname"><span class="pre">InitializeMultipole</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Ls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ws</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nIndex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jmax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'J'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/emfieldtools.html#InitializeMultipole"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.emfieldtools.InitializeMultipole" title="Link to this definition"></a></dt>
+<dd><p>Initiates a quantized photon multipole mode.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Ls</strong> (<em>list</em><em> of </em><em>int</em>) – List of the total angular momentum quantum numbers of the multipole components</p></li>
+<li><p><strong>Ms</strong> (<em>list</em><em> of </em><em>int</em>) – List of the magnetic quantum numbers (J_z projections) of the multipole components</p></li>
+<li><p><strong>Ps</strong> (<em>list</em><em> of </em><em>int</em>) – List of the parity of the multipole components (-1)**L for electric type, (-1)**(L+1) for magnetic type</p></li>
+<li><p><strong>Ws</strong> (<em>list</em><em> of </em><em>float</em>) – List of the weights of the multipole components.</p></li>
+<li><p><strong>lam</strong> (<em>float</em>) – Wavelength of the mode in vacuum</p></li>
+<li><p><strong>nIndex</strong> (<em>float</em>) – Refractive index of the medium</p></li>
+<li><p><strong>jmax</strong> (<em>int</em>) – Maximum order of the spherical Bessel functions to be included in the expansion</p></li>
+<li><p><strong>C</strong> (<em>float</em>) – Gauge parameter, if None, the Lorenz gauge is used, otherwise the gauge is defined by the value of C.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Vector potential of the mode
+A0 (SField): Scalar potential of the mode
+Evect (VField): Electric field of the mode
+Hvect (VField): Magnetic field of the mode</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Avect (<a class="reference internal" href="#pyRET.fields.VField" title="pyRET.fields.VField">VField</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRET.emfieldtools.getEHfromA">
+<span class="sig-prename descclassname"><span class="pre">pyRET.emfieldtools.</span></span><span class="sig-name descname"><span class="pre">getEHfromA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Avect</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nIndex</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/emfieldtools.html#getEHfromA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.emfieldtools.getEHfromA" title="Link to this definition"></a></dt>
+<dd><p>Given the vector potential and scalar potential of a mode, calculates the electric and magnetic fields.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Avect</strong> (<a class="reference internal" href="#pyRET.fields.VField" title="pyRET.fields.VField"><em>VField</em></a>) – Vector potential of the mode</p></li>
+<li><p><strong>A0</strong> (<a class="reference internal" href="#pyRET.fields.SField" title="pyRET.fields.SField"><em>SField</em></a>) – Scalar potential of the mode</p></li>
+<li><p><strong>nIndex</strong> (<em>float</em>) – Refractive index of the medium</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Electric field of the mode
+Hvect (VField): Magnetic field of the mode</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Evect (<a class="reference internal" href="#pyRET.fields.VField" title="pyRET.fields.VField">VField</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-pyRET.wavefunctions">
+<span id="toolkit-to-define-wavefunctions"></span><h2>Toolkit to define wavefunctions<a class="headerlink" href="#module-pyRET.wavefunctions" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyRET.wavefunctions.WFunction">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyRET.wavefunctions.</span></span><span class="sig-name descname"><span class="pre">WFunction</span></span><a class="reference internal" href="_modules/pyRET/wavefunctions.html#WFunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.wavefunctions.WFunction" title="Link to this definition"></a></dt>
+<dd><p>Class representing  a Wavefunction</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.wavefunctions.WFunction.isGamma">
+<span class="sig-name descname"><span class="pre">isGamma</span></span><a class="headerlink" href="#pyRET.wavefunctions.WFunction.isGamma" title="Link to this definition"></a></dt>
+<dd><p>True if the wavefuncton is at Gamma point</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.wavefunctions.WFunction.Gs">
+<span class="sig-name descname"><span class="pre">Gs</span></span><a class="headerlink" href="#pyRET.wavefunctions.WFunction.Gs" title="Link to this definition"></a></dt>
+<dd><p>numpy complex array shape (3, NG) denoting the G vectors for plane wave expansion</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.wavefunctions.WFunction.evcCs">
+<span class="sig-name descname"><span class="pre">evcCs</span></span><a class="headerlink" href="#pyRET.wavefunctions.WFunction.evcCs" title="Link to this definition"></a></dt>
+<dd><p>numpy complex array of shape (1, NG) - plane wave expansion coefficients for a specific KS state</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.wavefunctions.WFunction.NG">
+<span class="sig-name descname"><span class="pre">NG</span></span><a class="headerlink" href="#pyRET.wavefunctions.WFunction.NG" title="Link to this definition"></a></dt>
+<dd><p>int storing number of plane waves</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.wavefunctions.WFunction.isplanewave">
+<span class="sig-name descname"><span class="pre">isplanewave</span></span><a class="headerlink" href="#pyRET.wavefunctions.WFunction.isplanewave" title="Link to this definition"></a></dt>
+<dd><p>True when the plane wave expansion exists.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.wavefunctions.WFunction.MPField">
+<span class="sig-name descname"><span class="pre">MPField</span></span><a class="headerlink" href="#pyRET.wavefunctions.WFunction.MPField" title="Link to this definition"></a></dt>
+<dd><p>SField object storing the multipole expanded scalar field. can be empty, in that case isplanewave = True</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#pyRET.fields.SField" title="pyRET.fields.SField">SField</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.wavefunctions.WFunction.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/wavefunctions.html#WFunction.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.wavefunctions.WFunction.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialization</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.wavefunctions.WFunction.Encode">
+<span class="sig-name descname"><span class="pre">Encode</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/wavefunctions.html#WFunction.Encode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.wavefunctions.WFunction.Encode" title="Link to this definition"></a></dt>
+<dd><p>encodes to jsonizable data</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.wavefunctions.WFunction.Decode">
+<span class="sig-name descname"><span class="pre">Decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/wavefunctions.html#WFunction.Decode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.wavefunctions.WFunction.Decode" title="Link to this definition"></a></dt>
+<dd><p>decodes from json data</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.wavefunctions.WFunction.readfromhdf5">
+<span class="sig-name descname"><span class="pre">readfromhdf5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iKS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cpA</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/wavefunctions.html#WFunction.readfromhdf5"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.wavefunctions.WFunction.readfromhdf5" title="Link to this definition"></a></dt>
+<dd><p>reads a specific KS state iKS into the plane wave basis
+from a hdf5 file generrated by quantum espresso. cpA = cell parameter block.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.wavefunctions.WFunction.readfromhdf5_parallel">
+<span class="sig-name descname"><span class="pre">readfromhdf5_parallel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iKS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cpA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/wavefunctions.html#WFunction.readfromhdf5_parallel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.wavefunctions.WFunction.readfromhdf5_parallel" title="Link to this definition"></a></dt>
+<dd><p>reads a specific KS state iKS into the plane wave basis
+from a hdf5 file generrated by quantum espresso. cpA = cell parameter block. Uses parallel hdf5.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.wavefunctions.WFunction.torgrid">
+<span class="sig-name descname"><span class="pre">torgrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rgrid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">istart</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">istep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kparity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/wavefunctions.html#WFunction.torgrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.wavefunctions.WFunction.torgrid" title="Link to this definition"></a></dt>
+<dd><p>Calculates values at coordinate space.
+istart and istep can be used to skip over plane waves. kparity is the parity in k-space- specifically relevant
+for calculating at Gamma point.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.wavefunctions.WFunction.getharmonics">
+<span class="sig-name descname"><span class="pre">getharmonics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lmax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/wavefunctions.html#WFunction.getharmonics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.wavefunctions.WFunction.getharmonics" title="Link to this definition"></a></dt>
+<dd><p>Using the plane wave basis, analytically creates a Scalar Field object into the attr. MPField</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.wavefunctions.WFunction.scale">
+<span class="sig-name descname"><span class="pre">scale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fact</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/wavefunctions.html#WFunction.scale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.wavefunctions.WFunction.scale" title="Link to this definition"></a></dt>
+<dd><p>Scales the Wavefunction by a complex scalar fact and returns a copy.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.wavefunctions.WFunction.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/wavefunctions.html#WFunction.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.wavefunctions.WFunction.copy" title="Link to this definition"></a></dt>
+<dd><p>deep copy</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/wavefunctions.html#WFunction.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Link to this definition"></a></dt>
+<dd><p>Deep copy Wavefunction</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id2">
+<span class="sig-name descname"><span class="pre">getharmonics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lmax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/wavefunctions.html#WFunction.getharmonics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id2" title="Link to this definition"></a></dt>
+<dd><p>Computes multipole expansion of the wavefunction using the plane wave expansion coefficients. This is done by using the identity that a plane wave can be expanded in terms of spherical harmonics and spherical Bessel functions. The resulting multipole expansion is stored in the MPField attribute of the wavefunction object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>lmax</strong> (<em>int</em>) – maximum angular momentum quantum number for the multipole expansion</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.wavefunctions.WFunction.kpsitorgrid">
+<span class="sig-name descname"><span class="pre">kpsitorgrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgrid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">istart</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">istep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/wavefunctions.html#WFunction.kpsitorgrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.wavefunctions.WFunction.kpsitorgrid" title="Link to this definition"></a></dt>
+<dd><p>Calculates k  operating on psi over a specific position grid. This is useful for calculating the momentum matrix elements.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rgrid</strong> (<em>array-like</em>) – 3 x N array of coordinates where the wavefunction needs to be evaluated.</p></li>
+<li><p><strong>istart</strong> (<em>int</em><em>, </em><em>optional</em>) – Starting index for plane wave summation. Defaults to 0.</p></li>
+<li><p><strong>istep</strong> (<em>int</em><em>, </em><em>optional</em>) – Step size for plane wave summation. Defaults to 1.</p></li>
+<li><p><strong>dr</strong> (<em>float</em><em>, </em><em>optional</em>) – Finite difference step size for numerical differentiation when plane wave basis is not available. Defaults to None, in which case a small value of 1e-12 is used.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.wavefunctions.WFunction.readfromdat">
+<span class="sig-name descname"><span class="pre">readfromdat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iKS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cpA</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/wavefunctions.html#WFunction.readfromdat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.wavefunctions.WFunction.readfromdat" title="Link to this definition"></a></dt>
+<dd><p>Reads the plane waves from a .dat file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) – path to the .dat file containing the plane wave expansion of the wavefunction</p></li>
+<li><p><strong>iKS</strong> (<em>int</em>) – index of the KS state to be read from the .dat file</p></li>
+<li><p><strong>cpA</strong> (<em>array-like</em>) – cell parameter block</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id3">
+<span class="sig-name descname"><span class="pre">readfromhdf5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iKS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cpA</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/wavefunctions.html#WFunction.readfromhdf5"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id3" title="Link to this definition"></a></dt>
+<dd><p>Reads the plane waves from hdf5 file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) – path to the hdf5 file containing the plane wave expansion of the wavefunction</p></li>
+<li><p><strong>iKS</strong> (<em>int</em>) – index of the KS state to be read from the hdf5</p></li>
+<li><p><strong>cpA</strong> (<em>array-like</em>) – cell parameter block</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id4">
+<span class="sig-name descname"><span class="pre">readfromhdf5_parallel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iKS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cpA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/wavefunctions.html#WFunction.readfromhdf5_parallel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id4" title="Link to this definition"></a></dt>
+<dd><p>Reads the plane waves from hdf5 file in parallel</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) – path to the hdf5 file containing the plane wave expansion of the wavefunction</p></li>
+<li><p><strong>iKS</strong> (<em>int</em>) – index of the KS state to be read from the hdf5</p></li>
+<li><p><strong>cpA</strong> (<em>array-like</em>) – cell parameter block</p></li>
+<li><p><strong>comm</strong> (<em>MPI.Comm</em>) – MPI communicator for parallel reading</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id5">
+<span class="sig-name descname"><span class="pre">torgrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgrid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">istart</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">istep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kparity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/wavefunctions.html#WFunction.torgrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id5" title="Link to this definition"></a></dt>
+<dd><p>Project the wavefunction from the plane wave basis onto a user specified position grid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rgrid</strong> (<em>array-like</em>) – 3 x N array of coordinates where the wavefunction needs to be evaluated.</p></li>
+<li><p><strong>istart</strong> (<em>int</em><em>, </em><em>optional</em>) – Starting index for plane wave summation. Defaults to 0.</p></li>
+<li><p><strong>istep</strong> (<em>int</em><em>, </em><em>optional</em>) – Step size for plane wave summation. Defaults to 1.</p></li>
+<li><p><strong>kparity</strong> (<em>int</em><em>, </em><em>optional</em>) – Parity in k-space, relevant for Gamma point. Defaults to 1.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<p id="module-pyRET.WFtools">Helper functions for wavefunction processing.</p>
+</section>
+<section id="module-pyRET.Vtools">
+<span id="toolkit-to-calculate-the-matrix-elements"></span><h2>Toolkit to calculate the matrix elements<a class="headerlink" href="#module-pyRET.Vtools" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRET.Vtools.V12">
+<span class="sig-prename descclassname"><span class="pre">pyRET.Vtools.</span></span><span class="sig-name descname"><span class="pre">V12</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wfr1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwfr1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wfr2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwfr2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rgrids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">P</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nIndex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Cgauge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Hint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Adotp'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rshift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">array([0.,</span> <span class="pre">0.,</span> <span class="pre">0.])</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'J'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dV</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">etaeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/Vtools.html#V12"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.Vtools.V12" title="Link to this definition"></a></dt>
+<dd><p>Computes the matrix elements with specific positions and wavefunctions. This is the core function that computes the V matrix elements for a given set of wavefunctions, multipole parameters, and positions. It can compute the matrix elements for both the “Adotp” and “Edotr” interaction Hamiltonians, and it can also handle different gauges and radial function types. The computed matrix elements are returned as a 2x2 matrix corresponding to the different spin configurations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wfr1</strong> (<em>numpy array</em><em> of </em><em>shape</em><em> (</em><em>N</em><em>, </em><em>N</em><em>, </em><em>N</em><em>)</em>) – Wavefunction of the initial state</p></li>
+<li><p><strong>kwfr1</strong> (<em>numpy array</em><em> of </em><em>shape</em><em> (</em><em>3</em><em>, </em><em>N</em><em>, </em><em>N</em><em>, </em><em>N</em><em>)</em>) – Gradient of the wavefunction of the initial state</p></li>
+<li><p><strong>wfr2</strong> (<em>numpy array</em><em> of </em><em>shape</em><em> (</em><em>N</em><em>, </em><em>N</em><em>, </em><em>N</em><em>)</em>) – Wavefunction of the final state</p></li>
+<li><p><strong>kwfr2</strong> (<em>numpy array</em><em> of </em><em>shape</em><em> (</em><em>3</em><em>, </em><em>N</em><em>, </em><em>N</em><em>, </em><em>N</em><em>)</em>) – Gradient of the wavefunction of the final state</p></li>
+<li><p><strong>rgrids</strong> (<em>numpy array</em><em> of </em><em>shape</em><em> (</em><em>3</em><em>,</em><em>n1</em><em>,</em><em>n2</em><em>,</em><em>..nM</em><em>, </em><em>N</em><em>, </em><em>N</em><em>, </em><em>N</em><em>)</em>) – Radial grid for the computation of the matrix elements</p></li>
+<li><p><strong>k</strong> (<em>float</em>) – Wavevector of the emitted photon</p></li>
+<li><p><strong>L</strong> (<em>int</em>) – Orbital angular momentum</p></li>
+<li><p><strong>M</strong> (<em>int</em>) – projected total angular momentum</p></li>
+<li><p><strong>P</strong> (<em>int</em>) – Parity of the multipole</p></li>
+<li><p><strong>nIndex</strong> (<em>float</em>) – Refractive index of the medium. Defaults to 1.</p></li>
+<li><p><strong>Cgauge</strong> (<em>int</em>) – Gauge parameter. 0 for Coulomb gauge.</p></li>
+<li><p><strong>Hint</strong> (<em>str</em>) – Type of interaction Hamiltonian to use. Options are “Adotp” or “Edotr”. Defaults to “Adotp”.</p></li>
+<li><p><strong>rshift</strong> (<em>numpy array</em><em> of </em><em>shape</em><em> (</em><em>3</em><em>,</em><em>)</em>) – Additional shift in position. Optional.</p></li>
+<li><p><strong>radtype</strong> (<em>str</em>) – Type of radial function to use. Options are “J” for Bessel functions and “H1” for Hankel functions. Defaults to “J”.</p></li>
+<li><p><strong>dV</strong> (<em>float</em>) – Volume element for the integration. If None, it will be computed from the rgrids. Defaults to None.</p></li>
+<li><p><strong>etaeff</strong> (<em>float</em>) – Effective mass of electron in the Pauli-Fierz hamiltonian normalized to the free electron mass.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>matrix elements. The first two dimensions correspond to the spin configurations (spin flip tag on initial and final states), and the remaining dimensions correspond to the spatial grid defined by rgrids.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>V12 (numpy array of shape (2, 2, n1, n2, … nM))</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRET.Vtools.V12_ED">
+<span class="sig-prename descclassname"><span class="pre">pyRET.Vtools.</span></span><span class="sig-name descname"><span class="pre">V12_ED</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pEDs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rvects</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">P</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nIndex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'J'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Cgauge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">etaeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">includespin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/Vtools.html#V12_ED"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.Vtools.V12_ED" title="Link to this definition"></a></dt>
+<dd><p>Computes matrix element under the electric dipole approximation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pEDs</strong> (<em>numpy array</em><em> of </em><em>shape</em><em> (</em><em>3</em><em>,</em><em>)</em>) – The x, y, z components of the electric dipole moment vector.</p></li>
+<li><p><strong>rvects</strong> (<em>numpy array</em><em> of </em><em>shape</em><em> (</em><em>3</em><em>, </em><em>n1</em><em>, </em><em>n2</em><em>, </em><em>...</em><em> nM</em><em>)</em>) – The x, y, z positions of the dipole.</p></li>
+<li><p><strong>k</strong> (<em>float</em>) – The wavevector.</p></li>
+<li><p><strong>L</strong> (<em>int</em>) – Multipole parameters.</p></li>
+<li><p><strong>M</strong> (<em>int</em>) – Multipole parameters.</p></li>
+<li><p><strong>P</strong> (<em>int</em>) – Multipole parameters.</p></li>
+<li><p><strong>nIndex</strong> (<em>float</em>) – Refractive index.</p></li>
+<li><p><strong>radtype</strong> (<em>str</em>) – Type of radial function.</p></li>
+<li><p><strong>Cgauge</strong> (<em>int</em>) – Gauge parameter.</p></li>
+<li><p><strong>etaeff</strong> (<em>float</em>) – Effective mass correction.</p></li>
+<li><p><strong>includespin</strong> (<em>bool</em>) – Whether to include spin effects.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The interaction matrix element under the electric dipole approximation.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>V12 (numpy array of shape (2, 2, n1, n2, … nM))</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRET.Vtools.V12_MD">
+<span class="sig-prename descclassname"><span class="pre">pyRET.Vtools.</span></span><span class="sig-name descname"><span class="pre">V12_MD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pMDs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rvects</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">P</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nIndex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'J'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Cgauge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">etaeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">includespin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/Vtools.html#V12_MD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.Vtools.V12_MD" title="Link to this definition"></a></dt>
+<dd><p>Computes matrix element under the magnetic dipole approximation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pMDs</strong> (<em>numpy array</em><em> of </em><em>shape</em><em> (</em><em>3</em><em>,</em><em>)</em>) – The x, y, z components of the magnetic dipole moment vector.</p></li>
+<li><p><strong>rvects</strong> (<em>numpy array</em><em> of </em><em>shape</em><em> (</em><em>3</em><em>, </em><em>n1</em><em>, </em><em>n2</em><em>, </em><em>...</em><em> nM</em><em>)</em>) – The x, y, z positions of the dipole.</p></li>
+<li><p><strong>k</strong> (<em>float</em>) – The wavevector.</p></li>
+<li><p><strong>L</strong> (<em>int</em>) – Multipole parameters.</p></li>
+<li><p><strong>M</strong> (<em>int</em>) – Multipole parameters.</p></li>
+<li><p><strong>P</strong> (<em>int</em>) – Multipole parameters.</p></li>
+<li><p><strong>nIndex</strong> (<em>float</em>) – Refractive index.</p></li>
+<li><p><strong>radtype</strong> (<em>str</em>) – Type of radial function.</p></li>
+<li><p><strong>Cgauge</strong> (<em>int</em>) – Gauge parameter.</p></li>
+<li><p><strong>etaeff</strong> (<em>float</em>) – Effective mass correction.</p></li>
+<li><p><strong>includespin</strong> (<em>bool</em>) – Whether to include spin effects.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The interaction matrix element under the magnetic dipole approximation.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>V12 (numpy array of shape (2, 2, n1, n2, … nM))</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRET.Vtools.V12_par">
+<span class="sig-prename descclassname"><span class="pre">pyRET.Vtools.</span></span><span class="sig-name descname"><span class="pre">V12_par</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wfr1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwfr1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wfr2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwfr2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rgrids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">P</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nIndex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Cgauge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Hint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Adotp'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rshift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">array([0.,</span> <span class="pre">0.,</span> <span class="pre">0.])</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'J'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dV</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">etaeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parallel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/Vtools.html#V12_par"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.Vtools.V12_par" title="Link to this definition"></a></dt>
+<dd><p>Parallely computes, using mpi4py, the matrix elements with specific positions and wavefunctions. This is the core function that computes the V matrix elements for a given set of wavefunctions, multipole parameters, and positions. It can compute the matrix elements for both the “Adotp” and “Edotr” interaction Hamiltonians, and it can also handle different gauges and radial function types. The computed matrix elements are returned as a 2x2 matrix corresponding to the different spin configurations. This function also supports serial implementation if parallel flag is set to False.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wfr1</strong> (<em>numpy array</em><em> of </em><em>shape</em><em> (</em><em>N</em><em>, </em><em>N</em><em>, </em><em>N</em><em>)</em>) – Wavefunction of the initial state</p></li>
+<li><p><strong>kwfr1</strong> (<em>numpy array</em><em> of </em><em>shape</em><em> (</em><em>3</em><em>, </em><em>N</em><em>, </em><em>N</em><em>, </em><em>N</em><em>)</em>) – Gradient of the wavefunction of the initial state</p></li>
+<li><p><strong>wfr2</strong> (<em>numpy array</em><em> of </em><em>shape</em><em> (</em><em>N</em><em>, </em><em>N</em><em>, </em><em>N</em><em>)</em>) – Wavefunction of the final state</p></li>
+<li><p><strong>kwfr2</strong> (<em>numpy array</em><em> of </em><em>shape</em><em> (</em><em>3</em><em>, </em><em>N</em><em>, </em><em>N</em><em>, </em><em>N</em><em>)</em>) – Gradient of the wavefunction of the final state</p></li>
+<li><p><strong>rgrids</strong> (<em>numpy array</em><em> of </em><em>shape</em><em> (</em><em>3</em><em>,</em><em>n1</em><em>,</em><em>n2</em><em>,</em><em>..nM</em><em>, </em><em>N</em><em>, </em><em>N</em><em>, </em><em>N</em><em>)</em>) – Radial grid for the computation of the matrix elements</p></li>
+<li><p><strong>k</strong> (<em>float</em>) – Wavevector of the emitted photon</p></li>
+<li><p><strong>L</strong> (<em>int</em>) – Orbital angular momentum</p></li>
+<li><p><strong>M</strong> (<em>int</em>) – projected total angular momentum</p></li>
+<li><p><strong>P</strong> (<em>int</em>) – Parity of the multipole</p></li>
+<li><p><strong>nIndex</strong> (<em>float</em>) – Refractive index of the medium. Defaults to 1.</p></li>
+<li><p><strong>Cgauge</strong> (<em>int</em>) – Gauge parameter. 0 for Coulomb gauge.</p></li>
+<li><p><strong>Hint</strong> (<em>str</em>) – Type of interaction Hamiltonian to use. Options are “Adotp” or “Edotr”. Defaults to “Adotp”.</p></li>
+<li><p><strong>rshift</strong> (<em>numpy array</em><em> of </em><em>shape</em><em> (</em><em>3</em><em>,</em><em>)</em>) – Additional shift in position. Optional.</p></li>
+<li><p><strong>radtype</strong> (<em>str</em>) – Type of radial function to use. Options are “J” for Bessel functions and “H1” for Hankel functions. Defaults to “J”.</p></li>
+<li><p><strong>dV</strong> (<em>float</em>) – Volume element for the integration. If None, it will be computed from the rgrids. Defaults to None.</p></li>
+<li><p><strong>etaeff</strong> (<em>float</em>) – Effective mass of electron in the Pauli-Fierz hamiltonian normalized to the free electron mass.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>matrix elements. The first two dimensions correspond to the spin configurations (spin flip tag on initial and final states), and the remaining dimensions correspond to the spatial grid defined by rgrids.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>V12 (numpy array of shape (2, 2, n1, n2, … nM))</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRET.Vtools.Veded">
+<span class="sig-prename descclassname"><span class="pre">pyRET.Vtools.</span></span><span class="sig-name descname"><span class="pre">Veded</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p1vec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2vec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rvects</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nIndex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omega</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/Vtools.html#Veded"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.Vtools.Veded" title="Link to this definition"></a></dt>
+<dd><p>Compute dipole-dipole interaction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p1vec</strong> (<em>numpy array</em><em> of </em><em>shape</em><em> (</em><em>3</em><em>,</em><em>)</em>) – The x, y, z components of the first dipole moment vector.</p></li>
+<li><p><strong>p2vec</strong> (<em>numpy array</em><em> of </em><em>shape</em><em> (</em><em>3</em><em>,</em><em>)</em>) – The x, y, z components of the second dipole moment vector.</p></li>
+<li><p><strong>rvects</strong> (<em>numpy array</em><em> of </em><em>shape</em><em> (</em><em>3</em><em>, </em><em>n1</em><em>, </em><em>n2</em><em>, </em><em>...</em><em> nM</em><em>)</em>) – The x, y, z positions of the dipoles.</p></li>
+<li><p><strong>nIndex</strong> (<em>float</em>) – Refractive index.</p></li>
+<li><p><strong>omega</strong> (<em>float</em>) – Angular frequency.</p></li>
+</ul>
+</dd>
+</dl>
+<p>mode = “nearfield” or “general”</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dipole-dipole interaction energy in SI units.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Veded (numpy array of shape (n1, n2, … nM))</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRET.Vtools.computeV">
+<span class="sig-prename descclassname"><span class="pre">pyRET.Vtools.</span></span><span class="sig-name descname"><span class="pre">computeV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">absorber_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">emitter_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">absorber_transitions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ws</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Lmax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Em_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Pos_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">WF_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radtype_abs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'H1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parallel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Hint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Adotp'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/Vtools.html#computeV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.Vtools.computeV" title="Link to this definition"></a></dt>
+<dd><p>This function computes the V matrix elements for a given set of transitions and photon energies. It checks if the wavefunction data for the absorber is available in the WF_data, and if so, it uses the wavefunction data to compute the V matrix elements. If not, it uses known multipole moments to compute the V matrix elements. The function can also handle both self-interaction (where the emitter and absorber are the same) and distant interaction (where the emitter and absorber are different) cases. The computed V matrix elements are stored in a V_data object and returned at the end of the function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>absorber_id</strong> (<em>str</em>) – Identifier for the absorber</p></li>
+<li><p><strong>emitter_id</strong> (<em>str</em>) – Identifier for the emitter</p></li>
+<li><p><strong>absorber_transitions</strong> (<em>list</em>) – List of transitions for the absorber</p></li>
+<li><p><strong>ws</strong> (<em>numpy array</em>) – Array of photon angular frequencies (rad/s)</p></li>
+<li><p><strong>Lmax</strong> (<em>int</em>) – Maximum multipole order to consider for the calculation of V</p></li>
+<li><p><strong>Em_data</strong> (<a class="reference internal" href="#pyRET.data_classes.Emitters_data" title="pyRET.data_classes.Emitters_data"><em>Emitters_data</em></a>) – Object of the Emitters_data class</p></li>
+<li><p><strong>Pos_data</strong> (<a class="reference internal" href="#pyRET.data_classes.Positions_data" title="pyRET.data_classes.Positions_data"><em>Positions_data</em></a><em> or </em><a class="reference internal" href="#pyRET.data_classes.Positions_data_1config" title="pyRET.data_classes.Positions_data_1config"><em>Positions_data_1config</em></a>) – Object of the Positions_data or Positions_data_1config class</p></li>
+<li><p><strong>WF_data</strong> (<em>list</em><em> of </em><a class="reference internal" href="#pyRET.data_classes.WFunctions_data" title="pyRET.data_classes.WFunctions_data"><em>WFunctions_data</em></a>) – List of objects of WFunctions_data class</p></li>
+<li><p><strong>radtype_abs</strong> (<em>str</em><em>, </em><em>optional</em>) – Type of radial function to use for the absorber. Options are “J” or “H1”. Defaults to “H1”.</p></li>
+<li><p><strong>parallel</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to use parallel processing. Defaults to True.</p></li>
+<li><p><strong>Hint</strong> (<em>str</em><em>, </em><em>optional</em>) – Type of interaction Hamiltonian to use. Options are “Adotp” or “Edotr”. Defaults to “Adotp”.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Object of the V_data class containing the computed matrix elements.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Vdata (<a class="reference internal" href="#pyRET.data_classes.V_data" title="pyRET.data_classes.V_data">V_data</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRET.Vtools.hasWF">
+<span class="sig-prename descclassname"><span class="pre">pyRET.Vtools.</span></span><span class="sig-name descname"><span class="pre">hasWF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">em</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">WF_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/Vtools.html#hasWF"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.Vtools.hasWF" title="Link to this definition"></a></dt>
+<dd><p>Check if the WF_data contains the wavefunction data for the emitter type em</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>em</strong> (<em>str</em>) – Emitter type</p></li>
+<li><p><strong>WF_data</strong> (<em>list</em>) – List of wavefunction data objects</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the wavefunction data for the emitter type em is found in WF_data, False otherwise</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyRET.Vtools.whichWF">
+<span class="sig-prename descclassname"><span class="pre">pyRET.Vtools.</span></span><span class="sig-name descname"><span class="pre">whichWF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">em</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">statei</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">statef</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">WF_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/Vtools.html#whichWF"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.Vtools.whichWF" title="Link to this definition"></a></dt>
+<dd><p>Find the indices of the Wavefunction data that corresponds to the states of a specific transition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>em</strong> (<em>str</em>) – Emitter type</p></li>
+<li><p><strong>statei</strong> (<em>str</em>) – Initial state of the transition</p></li>
+<li><p><strong>statef</strong> (<em>str</em>) – Final state of the transition</p></li>
+<li><p><strong>WF_data</strong> (<em>list</em>) – List of wavefunction data objects</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Index of the WF_data object that contains the wavefunction data for the initial state
+iemi (int): Index of the emitter type in the WF_data object that contains the wavefunction data for the initial state
+iwfdataf (int): Index of the WF_data object that contains the wavefunction data for the final state
+iemf (int): Index of the emitter type in the WF_data object that contains the wavefunction data for the final state</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>iwfdatai (int)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-pyRET.data_classes">
+<span id="data-classes"></span><h2>Data classes<a class="headerlink" href="#module-pyRET.data_classes" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyRET.data_classes.Emitters_data">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyRET.data_classes.</span></span><span class="sig-name descname"><span class="pre">Emitters_data</span></span><a class="reference internal" href="_modules/pyRET/data_classes.html#Emitters_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.data_classes.Emitters_data" title="Link to this definition"></a></dt>
+<dd><p>Dataclass representing types and corresponding information on the emitters.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.data_classes.Emitters_data.EmType">
+<span class="sig-name descname"><span class="pre">EmType</span></span><a class="headerlink" href="#pyRET.data_classes.Emitters_data.EmType" title="Link to this definition"></a></dt>
+<dd><p>dictionary with Emitter IDs as keys and emitter types as strings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.data_classes.Emitters_data.T1">
+<span class="sig-name descname"><span class="pre">T1</span></span><a class="headerlink" href="#pyRET.data_classes.Emitters_data.T1" title="Link to this definition"></a></dt>
+<dd><p>dictionary with Emitter IDs as keys and T1 values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.data_classes.Emitters_data.w">
+<span class="sig-name descname"><span class="pre">w</span></span><a class="headerlink" href="#pyRET.data_classes.Emitters_data.w" title="Link to this definition"></a></dt>
+<dd><p>dictionary with Emitter IDs as keys and transition frequencies (rad/s).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.data_classes.Emitters_data.k">
+<span class="sig-name descname"><span class="pre">k</span></span><a class="headerlink" href="#pyRET.data_classes.Emitters_data.k" title="Link to this definition"></a></dt>
+<dd><p>dictionary with Emitter IDs as keys and wave numbers (1/m).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.data_classes.Emitters_data.nIndex">
+<span class="sig-name descname"><span class="pre">nIndex</span></span><a class="headerlink" href="#pyRET.data_classes.Emitters_data.nIndex" title="Link to this definition"></a></dt>
+<dd><p>dictionary with Emitter IDs as keys and refractive indices of the medium the emitter sits in.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.data_classes.Emitters_data.pMPs">
+<span class="sig-name descname"><span class="pre">pMPs</span></span><a class="headerlink" href="#pyRET.data_classes.Emitters_data.pMPs" title="Link to this definition"></a></dt>
+<dd><p>dictionary with Emitter IDs as keys– predefined multipole moments (if any) of the emitters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.data_classes.Emitters_data.Decode">
+<span class="sig-name descname"><span class="pre">Decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/data_classes.html#Emitters_data.Decode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.data_classes.Emitters_data.Decode" title="Link to this definition"></a></dt>
+<dd><p>Load data from a jsonized form.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.data_classes.Emitters_data.Encode">
+<span class="sig-name descname"><span class="pre">Encode</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/data_classes.html#Emitters_data.Encode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.data_classes.Emitters_data.Encode" title="Link to this definition"></a></dt>
+<dd><p>Jsonize the data</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyRET.data_classes.Positions_data">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyRET.data_classes.</span></span><span class="sig-name descname"><span class="pre">Positions_data</span></span><a class="reference internal" href="_modules/pyRET/data_classes.html#Positions_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.data_classes.Positions_data" title="Link to this definition"></a></dt>
+<dd><p>Dataclass representing relative positions of the emitters. The attributes are dictionaries with the convention of first key = absorber id and second key = emitter id.
+The values are arrays of the corresponding data.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.data_classes.Positions_data.Rs">
+<span class="sig-name descname"><span class="pre">Rs</span></span><a class="headerlink" href="#pyRET.data_classes.Positions_data.Rs" title="Link to this definition"></a></dt>
+<dd><p>dictionary of dictionaries of radial positions of the emitters with respect to the absorber.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict of dict of numpy arrays</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.data_classes.Positions_data.Ts">
+<span class="sig-name descname"><span class="pre">Ts</span></span><a class="headerlink" href="#pyRET.data_classes.Positions_data.Ts" title="Link to this definition"></a></dt>
+<dd><p>dictionary of dictionaries of polar angles of the emitters with respect to the absorber.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict of dict of numpy arrays</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.data_classes.Positions_data.Ps">
+<span class="sig-name descname"><span class="pre">Ps</span></span><a class="headerlink" href="#pyRET.data_classes.Positions_data.Ps" title="Link to this definition"></a></dt>
+<dd><p>dictionary of dictionaries of azimuthal angles of the emitters with respect to the absorber.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict of dict of numpy arrays</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.data_classes.Positions_data.Rg">
+<span class="sig-name descname"><span class="pre">Rg</span></span><a class="headerlink" href="#pyRET.data_classes.Positions_data.Rg" title="Link to this definition"></a></dt>
+<dd><p>R in grid format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict of dict of numpy arrays</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.data_classes.Positions_data.Tg">
+<span class="sig-name descname"><span class="pre">Tg</span></span><a class="headerlink" href="#pyRET.data_classes.Positions_data.Tg" title="Link to this definition"></a></dt>
+<dd><p>T in grid format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict of dict of numpy arrays</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.data_classes.Positions_data.Pg">
+<span class="sig-name descname"><span class="pre">Pg</span></span><a class="headerlink" href="#pyRET.data_classes.Positions_data.Pg" title="Link to this definition"></a></dt>
+<dd><p>P in grid format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict of dict of numpy arrays</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.data_classes.Positions_data.Rvects">
+<span class="sig-name descname"><span class="pre">Rvects</span></span><a class="headerlink" href="#pyRET.data_classes.Positions_data.Rvects" title="Link to this definition"></a></dt>
+<dd><p>each array has a shape of (3, Nr, Nt, Np) and represents the position vectors of the emitters with respect to the absorber in Cartesian coordinates over the position grid. The first index of the array is for the x, y, z components of the position vector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict of dict of numpy arrays</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.data_classes.Positions_data.Decode">
+<span class="sig-name descname"><span class="pre">Decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/data_classes.html#Positions_data.Decode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.data_classes.Positions_data.Decode" title="Link to this definition"></a></dt>
+<dd><p>Load data from a jsonized form.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.data_classes.Positions_data.Encode">
+<span class="sig-name descname"><span class="pre">Encode</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/data_classes.html#Positions_data.Encode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.data_classes.Positions_data.Encode" title="Link to this definition"></a></dt>
+<dd><p>Jsonize the data</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyRET.data_classes.Positions_data_1config">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyRET.data_classes.</span></span><span class="sig-name descname"><span class="pre">Positions_data_1config</span></span><a class="reference internal" href="_modules/pyRET/data_classes.html#Positions_data_1config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.data_classes.Positions_data_1config" title="Link to this definition"></a></dt>
+<dd><p>Dataclass representing relative positions of the emitters. This is similar to the Positions_data class but is for a single configuration of emitter-absorber positions.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.data_classes.Positions_data_1config.Rs">
+<span class="sig-name descname"><span class="pre">Rs</span></span><a class="headerlink" href="#pyRET.data_classes.Positions_data_1config.Rs" title="Link to this definition"></a></dt>
+<dd><p>radial positions of the emitters with respect to the absorber.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.data_classes.Positions_data_1config.Ts">
+<span class="sig-name descname"><span class="pre">Ts</span></span><a class="headerlink" href="#pyRET.data_classes.Positions_data_1config.Ts" title="Link to this definition"></a></dt>
+<dd><p>polar angles of the emitters with respect to the absorber.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.data_classes.Positions_data_1config.Ps">
+<span class="sig-name descname"><span class="pre">Ps</span></span><a class="headerlink" href="#pyRET.data_classes.Positions_data_1config.Ps" title="Link to this definition"></a></dt>
+<dd><p>azimuthal angles of the emitters with respect to the absorber.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.data_classes.Positions_data_1config.Rvects">
+<span class="sig-name descname"><span class="pre">Rvects</span></span><a class="headerlink" href="#pyRET.data_classes.Positions_data_1config.Rvects" title="Link to this definition"></a></dt>
+<dd><p>position vectors of the emitters with respect to the absorber in Cartesian coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.data_classes.Positions_data_1config.Decode">
+<span class="sig-name descname"><span class="pre">Decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/data_classes.html#Positions_data_1config.Decode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.data_classes.Positions_data_1config.Decode" title="Link to this definition"></a></dt>
+<dd><p>Load data from a jsonized form.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.data_classes.Positions_data_1config.Encode">
+<span class="sig-name descname"><span class="pre">Encode</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/data_classes.html#Positions_data_1config.Encode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.data_classes.Positions_data_1config.Encode" title="Link to this definition"></a></dt>
+<dd><p>Jsonize the data</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyRET.data_classes.V_data">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyRET.data_classes.</span></span><span class="sig-name descname"><span class="pre">V_data</span></span><a class="reference internal" href="_modules/pyRET/data_classes.html#V_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.data_classes.V_data" title="Link to this definition"></a></dt>
+<dd><p>Dataclass containing matrix elements computed in spherical multipolar basis.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.data_classes.V_data.ws">
+<span class="sig-name descname"><span class="pre">ws</span></span><a class="headerlink" href="#pyRET.data_classes.V_data.ws" title="Link to this definition"></a></dt>
+<dd><p>dictionary with absorber IDs as keys and values as dictionaries with emitter IDs as keys and complex numbers as values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.data_classes.V_data.V">
+<span class="sig-name descname"><span class="pre">V</span></span><a class="headerlink" href="#pyRET.data_classes.V_data.V" title="Link to this definition"></a></dt>
+<dd><p>nested dictionary of the format V[absorber_id][emitter_id][absorber_transition][L][M][P] = complex ND Array
+absorber_transition is of the format “‘initial_state’-to-‘final_state’”
+L, M, P are the multipole order, multipole component and parity of the transition respectively.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.data_classes.V_data.Decode">
+<span class="sig-name descname"><span class="pre">Decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/data_classes.html#V_data.Decode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.data_classes.V_data.Decode" title="Link to this definition"></a></dt>
+<dd><p>Load data from a jsonized form.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.data_classes.V_data.Encode">
+<span class="sig-name descname"><span class="pre">Encode</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/data_classes.html#V_data.Encode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.data_classes.V_data.Encode" title="Link to this definition"></a></dt>
+<dd><p>Jsonize the data</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyRET.data_classes.WFunctions_data">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyRET.data_classes.</span></span><span class="sig-name descname"><span class="pre">WFunctions_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">emitterTypes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">states</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iKSs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rgridwf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pwout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wfs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwfs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wfrs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwfrs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/data_classes.html#WFunctions_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.data_classes.WFunctions_data" title="Link to this definition"></a></dt>
+<dd><p>Dataclass for handling wavefunctions.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.data_classes.WFunctions_data.emitterTypes">
+<span class="sig-name descname"><span class="pre">emitterTypes</span></span><a class="headerlink" href="#pyRET.data_classes.WFunctions_data.emitterTypes" title="Link to this definition"></a></dt>
+<dd><p>list of emitter types.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.data_classes.WFunctions_data.states">
+<span class="sig-name descname"><span class="pre">states</span></span><a class="headerlink" href="#pyRET.data_classes.WFunctions_data.states" title="Link to this definition"></a></dt>
+<dd><p>list of list of states.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of list of string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.data_classes.WFunctions_data.iKSs">
+<span class="sig-name descname"><span class="pre">iKSs</span></span><a class="headerlink" href="#pyRET.data_classes.WFunctions_data.iKSs" title="Link to this definition"></a></dt>
+<dd><p>list of list of KS indices for the states.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of list of int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.data_classes.WFunctions_data.rgridwf">
+<span class="sig-name descname"><span class="pre">rgridwf</span></span><a class="headerlink" href="#pyRET.data_classes.WFunctions_data.rgridwf" title="Link to this definition"></a></dt>
+<dd><p>list of rgridwfs- separate for each emitter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of arrays</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.data_classes.WFunctions_data.Ns">
+<span class="sig-name descname"><span class="pre">Ns</span></span><a class="headerlink" href="#pyRET.data_classes.WFunctions_data.Ns" title="Link to this definition"></a></dt>
+<dd><p>list of dict of normalization constants for each state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.data_classes.WFunctions_data.pwout">
+<span class="sig-name descname"><span class="pre">pwout</span></span><a class="headerlink" href="#pyRET.data_classes.WFunctions_data.pwout" title="Link to this definition"></a></dt>
+<dd><p>list of pw.out texts correspinding to each emitter for book keeping.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.data_classes.WFunctions_data.wfs">
+<span class="sig-name descname"><span class="pre">wfs</span></span><a class="headerlink" href="#pyRET.data_classes.WFunctions_data.wfs" title="Link to this definition"></a></dt>
+<dd><p>list of dict of wfs (WFunction class object) for each state as the key.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.data_classes.WFunctions_data.kwfs">
+<span class="sig-name descname"><span class="pre">kwfs</span></span><a class="headerlink" href="#pyRET.data_classes.WFunctions_data.kwfs" title="Link to this definition"></a></dt>
+<dd><p>list of dict of k operated on wfs (Vector Fields) for each state as the key. Can be empty</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.data_classes.WFunctions_data.wfrs">
+<span class="sig-name descname"><span class="pre">wfrs</span></span><a class="headerlink" href="#pyRET.data_classes.WFunctions_data.wfrs" title="Link to this definition"></a></dt>
+<dd><p>list of dict of values of the wavefunctions over corresponding position grids.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyRET.data_classes.WFunctions_data.kwfrs">
+<span class="sig-name descname"><span class="pre">kwfrs</span></span><a class="headerlink" href="#pyRET.data_classes.WFunctions_data.kwfrs" title="Link to this definition"></a></dt>
+<dd><p>list of dict of values of the k operated wavefunctions over corresponding position grids.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.data_classes.WFunctions_data.Decode">
+<span class="sig-name descname"><span class="pre">Decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/data_classes.html#WFunctions_data.Decode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.data_classes.WFunctions_data.Decode" title="Link to this definition"></a></dt>
+<dd><p>Load data from a jsonized form.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyRET.data_classes.WFunctions_data.Encode">
+<span class="sig-name descname"><span class="pre">Encode</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyRET/data_classes.html#WFunctions_data.Encode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyRET.data_classes.WFunctions_data.Encode" title="Link to this definition"></a></dt>
+<dd><p>Jsonize the data</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tutorial.html" class="btn btn-neutral float-right" title="Tutorial" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, University of Chicago and Argonne National Laboratory.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,323 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tutorial &mdash; PyRET  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Credits" href="credits.html" />
+    <link rel="prev" title="Documentation" href="documentation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            PyRET
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentation.html">Documentation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#loading-wavefunctions">Loading Wavefunctions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#plane-wave-expansion">(1) Plane wave expansion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#spherical-harmonic-expansion">(2) Spherical harmonic expansion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#real-space-grid">(3) Real space grid</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#define-emitters-and-their-positions">Define emitters and their positions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#compute-matrix-elements">Compute matrix elements</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#computation-for-single-multipoles">(1) Computation for single multipoles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#computation-for-all-multipoles-and-all-positions">(2) Computation for all multipoles and all positions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compute-for-all-multipoles-and-all-positions-in-a-parallel-setting">(3) Compute for all multipoles and all positions in a parallel setting</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="credits.html">Credits</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">PyRET</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Tutorial</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/tutorial.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="tutorial">
+<span id="id1"></span><h1>Tutorial<a class="headerlink" href="#tutorial" title="Link to this heading"></a></h1>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading"></a></h2>
+<p>In this page we discuss the basic approach implemented in <strong>pyRET</strong> and discuss a few examples of how to use the various packages.</p>
+<p>Let us say that we have to compute the photon mediated near field energy transfer between a source (labeled as S) and the absorber (labeled as A). In the dilute limit, the isolated emitters comprises discrete energy levels with corresponding energy eigenstates- ground state <span class="math notranslate nohighlight">\(\mid \Phi_{GS}^{(S/A)} \rangle\)</span> and the excited state <span class="math notranslate nohighlight">\(\mid \Phi_{ES}^{(S/A)} \rangle\)</span>. These states are assumed to be multireference in general, and thus can be expressed as a linear combination of single Slater determinants. For example,</p>
+<div class="math notranslate nohighlight" id="equation-multireference-state">
+<span class="eqno">(1)<a class="headerlink" href="#equation-multireference-state" title="Link to this equation"></a></span>\[\begin{split}\langle \mid \Phi_{GS}^{(S)} \rangle = \sum_{\substack{j \in \mathrm{occ} \\ i \in \mathrm{unocc}}} \alpha_{ij}^{(GS)} c_j^{(S/A)\dagger} c_i^{(S)} \langle \mid D^{(S)} \rangle\end{split}\]</div>
+<p>and similar expressions would exist for the other states. Here <span class="math notranslate nohighlight">\(\langle \mid D^{(S)} \rangle\)</span> is a single Slater determinant built from filling out the first N orbitals in the single electron picture. For details, please see Appendix C and D of Ref. [1].</p>
+<p>Further, we aim to compute the matrix element corresponding to transitions between the multireference states with the interaction Hamiltonian <span class="math notranslate nohighlight">\(H_{int}\)</span> [1].</p>
+<div class="math notranslate nohighlight" id="equation-hint">
+<span class="eqno">(2)<a class="headerlink" href="#equation-hint" title="Link to this equation"></a></span>\[H_{int} = \sum_{E = S, A} \sum_{i=1}^{N_E}\left[-\frac{e\hat{\textbf{p}}_i\cdot\hat{\textbf{A}}}{2m_0}-\frac{e\hat{\textbf{A}}\cdot\hat{\textbf{p}}_i}{2m_0}+e\hat{A}_0 +g\frac{e\hbar}{2m_0}\hat{\bf{\sigma}}_i\cdot\bar\nabla\times\hat{\textbf{A}}\right].\]</div>
+<p>We employ the Slater-Condon rule to reduce the matrix element between Slater determinant to matrix element between orbitals. For example,</p>
+<div class="math notranslate nohighlight" id="equation-slater-condon-example">
+<span class="eqno">(3)<a class="headerlink" href="#equation-slater-condon-example" title="Link to this equation"></a></span>\[\begin{split}\langle \Phi_{ES}^{(S)} \mid H_{\mathrm{int}} \mid \Phi_{GS}^{(S)}, 1_{k,\alpha s} \rangle
+=\sum_{\substack{j \in \mathrm{occ} \\ i \in \mathrm{unocc}}}
+\alpha^{*}_{ij}
+\langle \phi^{(S)}_{j} \mid H_{\mathrm{int}} \mid \phi^{(S)}_{i}, 1_{k,\alpha s} \rangle\end{split}\]</div>
+<p>The single particle orbitals here are <span class="math notranslate nohighlight">\(\left|\phi^{(S)}_{i}\right\rangle\)</span>. This code provides an example of how we extract and store these single particle wavefunctions calculated using the Quantum Espresso Density Functional Theory code.</p>
+<p>The matrix element corresponding to the photon emission process to a photon mode of energy <span class="math notranslate nohighlight">\(\hbar c k\)</span> and <span class="math notranslate nohighlight">\(\alpha\)</span> denoting all other degrees of freedom (e.g. in this case orbital angular momentum L, total z-projected angular momentum M, and parity P) can be expressed as,</p>
+<div class="math notranslate nohighlight" id="equation-emission-matrix-element">
+<span class="eqno">(4)<a class="headerlink" href="#equation-emission-matrix-element" title="Link to this equation"></a></span>\[v_{k,\alpha}^{(S)} \sqrt{\Delta k} = \langle \Phi_{GS}^{(S)}, 1_{k,\alpha} \mid H_{\mathrm{int}} \mid \Phi_{ES}^{(S)} \rangle\]</div>
+<p>and the matrix element corresponding to the photon absorption process can be expressed as,</p>
+<div class="math notranslate nohighlight" id="equation-absorption-matrix-element">
+<span class="eqno">(5)<a class="headerlink" href="#equation-absorption-matrix-element" title="Link to this equation"></a></span>\[v_{k,\alpha}^{(A)} \sqrt{\Delta k} = \langle \Phi_{ES}^{(A)} \mid H_{\mathrm{int}} \mid \Phi_{GS}^{(A)}, 1_{k,\alpha} \rangle.\]</div>
+<p>Here <span class="math notranslate nohighlight">\(\Delta k\)</span> is the mode width parameter used to normalize the photon modes. For details, see Ref. [1].</p>
+<p>Once the matrix elements are computed, we then computed the overall energy transfer process matrix element as,</p>
+<div class="math notranslate nohighlight" id="equation-m-nret">
+<span class="eqno">(6)<a class="headerlink" href="#equation-m-nret" title="Link to this equation"></a></span>\[M = \frac{i\pi n_i}{\hbar c}\sum_{k,\alpha} v_{k,\alpha}^{(S)} v_{k,\alpha}^{(A)}.\]</div>
+<p>Once M is computed, the energy transfer can be computed under second order perturbation using Fermi’s golden rule as outlined in Ref. [1].</p>
+<p>With this background, now to start the proess we need the orbital wavefuntions that constitute the multireference states. In the following section, we discuss how the wavefunctions are handled in <strong>pyRET</strong>.</p>
+</section>
+<section id="loading-wavefunctions">
+<h2>Loading Wavefunctions<a class="headerlink" href="#loading-wavefunctions" title="Link to this heading"></a></h2>
+<p>The wavefunction object in <strong>pyRET</strong> is designed to contain three categories of information:</p>
+<section id="plane-wave-expansion">
+<h3>(1) Plane wave expansion<a class="headerlink" href="#plane-wave-expansion" title="Link to this heading"></a></h3>
+<p>A plane wave expansion of the wavefunction, as typically done in DFT codes such as Quantum ESPRESSO. In plane wave basis, the single electron orbitals are defined as</p>
+<div class="math notranslate nohighlight" id="equation-plane-wave-expansion">
+<span class="eqno">(7)<a class="headerlink" href="#equation-plane-wave-expansion" title="Link to this equation"></a></span>\[\phi(r) = \frac{1}{\sqrt{V}} \sum_{\mathbf{G}} c^{-}_{n\mathbf{k}}(\mathbf{G})e^{i(\mathbf{k}+\mathbf{G}) \cdot \mathbf{r}}\]</div>
+<p>The plane wave vectors <span class="math notranslate nohighlight">\(\mathbf{G}\)</span> and the expansion coefficients <span class="math notranslate nohighlight">\(c\)</span> are stored as .dat or .hdf5 files outputed by Quantum Espresso. <strong>pyRET</strong> provides modules that can read these plane wave basis and store the coefficients in an object of the <cite>WFunction</cite> class. The plane wave expansion is used to directly compute the k-operated wavefunction values, which are used in the computation of the matrix elements of the interaction Hamiltonian. For example,</p>
+<div class="math notranslate nohighlight" id="equation-plane-wave-expansion">
+<span class="eqno">(8)<a class="headerlink" href="#equation-plane-wave-expansion" title="Link to this equation"></a></span>\[\begin{split}\begin{aligned}
+k_x \phi(r) &amp;= -i \frac{\partial}{\partial x} \phi(r) \\
+&amp;= \frac{1}{\sqrt{V}} \sum_{\mathbf{G}} c^{-}_{n\mathbf{k}}(\mathbf{G}) (k_x+G_x) e^{i(\mathbf{k}+\mathbf{G}) \cdot \mathbf{r}}
+\end{aligned}\end{split}\]</div>
+</section>
+<section id="spherical-harmonic-expansion">
+<h3>(2) Spherical harmonic expansion<a class="headerlink" href="#spherical-harmonic-expansion" title="Link to this heading"></a></h3>
+<p>Alternatively, <strong>pyRET</strong> can operate the <cite>WFunction</cite> class in the form of a multipolar expansion of the wavefunction using the <cite>Scalar_field</cite> class where the angular components are expressed using the <cite>MP_SA</cite> (multipolar-scalar-angular) class and the radial function can be chosen to be either spherical Bessel functions or atomic orbital like radial dependence. The last feature helps in creating atomic orbital basis within <strong>pyRET</strong>.</p>
+</section>
+<section id="real-space-grid">
+<h3>(3) Real space grid<a class="headerlink" href="#real-space-grid" title="Link to this heading"></a></h3>
+<p>A real space grid of <span class="math notranslate nohighlight">\(\mid \phi(r)\rangle\)</span>, <span class="math notranslate nohighlight">\(k_x \mid \phi(r)\rangle\)</span>, <span class="math notranslate nohighlight">\(k_y \mid \phi(r)\rangle\)</span>, and <span class="math notranslate nohighlight">\(k_z \mid \phi(r)\rangle\)</span>. These k-operated values are directly computed from the plane wave expansion, and thus free from any numerical differentiation errors in computing the spatial derivatives. The calculated position grid are stored as an object of the <cite>WFunctions_data</cite> class defined in the <cite>data_classes.py</cite> module. For more details please see the examples in the examples directory.</p>
+</section>
+</section>
+<section id="define-emitters-and-their-positions">
+<h2>Define emitters and their positions<a class="headerlink" href="#define-emitters-and-their-positions" title="Link to this heading"></a></h2>
+<p>The next step is to define the emitter types and emitter positions corresponding to the system we want to simulate. <strong>pyRET</strong> stores the information on the emitters (source and absorber) and their relative positions as objects of classes <cite>Emitters_data</cite> and <cite>Positions_data</cite>. The emitters can be defined as dipolar emitters (electric dipole or magnetic dipole), or realistic emitters the orbitals of which are defined from first principles. The objects of the <cite>Emitters_data</cite> class stores as a dictionary all the defined single-orbital transitions, radiative lifetimes, energies, and other optional properties (like transition dipole moment for ideal dipole-like emitters) where the keys of the dictionary represents the emitter-id (represented as a string). Each emitter in the system of emitters possess an unique id. However, emitters with different emitter id can have same emitter types (also representd as a string). The <cite>Positions_data</cite> class objects store the relative positions between all possible pairs of emitters. Please refer to the detailed documentation and the example scripts for more details on usage.</p>
+</section>
+<section id="compute-matrix-elements">
+<h2>Compute matrix elements<a class="headerlink" href="#compute-matrix-elements" title="Link to this heading"></a></h2>
+<p>Once the single electron orbital wavefunctions have been imported into the <cite>WFunction</cite> and <cite>WFunctions_data</cite> class objects, and the emitter configurations are defined, we are now ready to compute the matrix elements corresponding to the absorption and emission, i.e. <span class="math notranslate nohighlight">\(v_{k,\alpha}^{(S)}\)</span> and <span class="math notranslate nohighlight">\(v_{k,\alpha}^{(A)}\)</span>. In practice this computation can be done in three different ways listed below with the order of increasing scalability:</p>
+<section id="computation-for-single-multipoles">
+<h3>(1) Computation for single multipoles<a class="headerlink" href="#computation-for-single-multipoles" title="Link to this heading"></a></h3>
+<p>To quickly check calculation of a single case in python you can directly run the <cite>V12_par</cite> method for computation using wavefunctions, <cite>V12_ED</cite> for matrix element computation for electric dipolar transition, and <cite>V12_MD</cite> for magnetic dipolar transition. Please refer to the documentation for more details. As an example, the <cite>V12_par</cite> method can be invoked by using</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">v</span> <span class="o">=</span> <span class="n">V12_par</span><span class="p">(</span>
+    <span class="n">initial_wavefunction_grid</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="c1"># Wavefunction grid data for initial state</span>
+    <span class="n">k_initial_wavefunction_grid</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="c1"># k-operated wavefunction grid data for initial state</span>
+    <span class="n">final_wavefunction_grid</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="c1"># Wavefunction grid data for final state</span>
+    <span class="n">k_final_wavefunction_grid</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="c1"># k-operated wavefunction grid data for final state</span>
+    <span class="n">rgrids</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="c1">#Positiongrid including wavefunction grid and relative positions between multipole center and the emitter center</span>
+    <span class="n">k</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="c1"># wavenumber of the photon in the medium</span>
+    <span class="n">L</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="c1"># Orbital angular momentum of the photon</span>
+    <span class="n">M</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="c1"># Projected total angular momentum of the photon</span>
+    <span class="n">P</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="c1"># Parity of the photon</span>
+    <span class="n">nIndex</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span> <span class="c1"># Refractive index of the medium</span>
+    <span class="n">Cgauge</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="c1"># Arbitrary gauge parameter. C=0 Coulomb.</span>
+    <span class="n">Hint</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Adotp&quot;</span><span class="p">,</span> <span class="c1"># Interaction hamiltonian type</span>
+    <span class="n">rshift</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="c1"># Additional shift of position as a control parameter</span>
+    <span class="n">radtype</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;J&quot;</span><span class="p">,</span> <span class="c1"># Radial function of the photon mode.</span>
+    <span class="n">dV</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1"># Volume element of WF grid</span>
+    <span class="n">etaeff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span> <span class="c1"># Effective mass scaling</span>
+    <span class="n">parallel</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="c1"># execution platform- parallel or serial</span>
+    <span class="p">):</span>
+</pre></div>
+</div>
+<p>In a similar way, <cite>V12_ED</cite> and <cite>V12_MD</cite> can be used when the emitter transition is known to be of ideal electric dipole or magnetic dipole types. For example,</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">v</span> <span class="o">=</span> <span class="n">V12_ED</span><span class="p">(</span>
+    <span class="n">pEDs</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="c1"># Transition dipole moment vector for the emitter transition</span>
+    <span class="n">rvects</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="c1"># Relative position vector between the emitter and the multipole center</span>
+    <span class="n">k</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="c1"># wavenumber of the photon in the medium</span>
+    <span class="n">L</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="c1"># Orbital angular momentum of the photon</span>
+    <span class="n">M</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="c1"># Projected total angular momentum of the photon</span>
+    <span class="n">P</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="c1"># Parity of the photon mode</span>
+    <span class="n">nIndex</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span> <span class="c1"># Refractive index of the medium</span>
+    <span class="n">radtype</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;J&quot;</span><span class="p">,</span> <span class="c1"># Radial function of the photon mode.</span>
+    <span class="n">Cgauge</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="c1"># Arbitrary gauge parameter. C=0 Coulomb.</span>
+    <span class="n">etaeff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span> <span class="c1"># Effective mass scaling</span>
+    <span class="n">includespin</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="c1"># Include spin in the calculation</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p>and</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">v</span> <span class="o">=</span> <span class="n">V12_MD</span><span class="p">(</span>
+    <span class="n">pMDs</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="c1"># Transition magnetic dipole moment vector for the emitter transition</span>
+    <span class="n">rvects</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="c1"># Relative position vector between the emitter and the multipole center</span>
+    <span class="n">k</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="c1"># wavenumber of the photon in the medium</span>
+    <span class="n">L</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="c1"># Orbital angular momentum of the photon</span>
+    <span class="n">M</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="c1"># Projected total angular momentum of the photon</span>
+    <span class="n">P</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="c1"># Parity of the photon mode</span>
+    <span class="n">nIndex</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span> <span class="c1"># Refractive index of the medium</span>
+    <span class="n">radtype</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;J&quot;</span><span class="p">,</span> <span class="c1"># Radial function of the photon mode.</span>
+    <span class="n">Cgauge</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="c1"># Arbitrary gauge parameter. C=0 Coulomb.</span>
+    <span class="n">etaeff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span> <span class="c1"># Effective mass scaling</span>
+    <span class="n">includespin</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="c1"># Include spin in the calculation</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="code docutils literal notranslate"><span class="pre">v[i,j]</span></code> represents the matrix elements for different spin flip configurations:
+- <code class="code docutils literal notranslate"><span class="pre">i,j</span> <span class="pre">=</span> <span class="pre">0,0</span></code>: spin conserving transition at both initial and final states
+- <code class="code docutils literal notranslate"><span class="pre">i,j</span> <span class="pre">=</span> <span class="pre">0,1</span></code>: spin conserving transition at initial state, spin flip at final state
+- <code class="code docutils literal notranslate"><span class="pre">i,j</span> <span class="pre">=</span> <span class="pre">1,0</span></code>: spin flip transition at initial state, spin conserving transition at final state
+- <code class="code docutils literal notranslate"><span class="pre">i,j</span> <span class="pre">=</span> <span class="pre">1,1</span></code>: spin flip transition at both initial and final states</p>
+</section>
+<section id="computation-for-all-multipoles-and-all-positions">
+<h3>(2) Computation for all multipoles and all positions<a class="headerlink" href="#computation-for-all-multipoles-and-all-positions" title="Link to this heading"></a></h3>
+<p>While the above way computes the matrix elements for a specific multipolar mode of photon, in computing the NRET rates one needs to sum over all multipolar modes, i.e. <span class="math notranslate nohighlight">\(L = 1, 2, ... L_{max}\)</span>, <span class="math notranslate nohighlight">\(M = -L, -L+1,..., L\)</span> and <span class="math notranslate nohighlight">\(P = -1 or 1\)</span>. This can be done using the <code class="code docutils literal notranslate"><span class="pre">computeV</span></code> method. An example usage is follows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">v</span> <span class="o">=</span> <span class="n">computeV</span><span class="p">(</span>
+    <span class="n">absorber_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="c1"># unique emitter-id corresponding to the absorber</span>
+    <span class="n">source_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="c1"># unique emitter-id corresponding to the source</span>
+    <span class="n">absorber_transitions</span><span class="p">:</span> <span class="nb">list</span> <span class="n">of</span> <span class="nb">str</span><span class="p">,</span> <span class="c1"># List of transitions at absorber</span>
+    <span class="n">ws</span><span class="p">:</span> <span class="nb">list</span> <span class="n">of</span> <span class="nb">float</span><span class="p">,</span> <span class="c1"># List of energies of photons (in rad/s)</span>
+    <span class="n">Lmax</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="c1"># Max order of the multipoles</span>
+    <span class="n">Em_data</span><span class="p">:</span> <span class="n">Emitters_data</span><span class="p">,</span> <span class="c1"># Emitters data object</span>
+    <span class="n">Pos_data</span><span class="p">:</span> <span class="n">Positions_data</span><span class="p">,</span> <span class="c1"># Positions data object</span>
+    <span class="n">WF_data</span><span class="p">:</span> <span class="nb">list</span> <span class="n">of</span> <span class="n">WFunctions_data</span><span class="p">,</span> <span class="c1"># List of WFunctions_data objects that will be searched for the states</span>
+    <span class="n">parallel</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p>In this case the return (<code class="code docutils literal notranslate"><span class="pre">v</span></code>) is an object of the class <code class="code docutils literal notranslate"><span class="pre">Vdata</span></code> and specific matrix elements can be retrieved as</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">v_LMP</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="n">absorber_id</span><span class="p">][</span><span class="n">source_id</span><span class="p">][</span><span class="n">absorber_transition</span><span class="p">][</span><span class="n">L</span><span class="p">][</span><span class="n">M</span><span class="p">][</span><span class="n">P</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>The shape of <code class="code docutils literal notranslate"><span class="pre">v_LMP</span></code> is <code class="code docutils literal notranslate"><span class="pre">(2,2,)</span> <span class="pre">+</span> <span class="pre">(Nw,)</span> <span class="pre">+</span> <span class="pre">Pos_data.Rg[&quot;absorber_id&quot;][&quot;source_id&quot;]</span></code>. The first two axis encodes the information on whether there is a spin conserving or spin flip process at the initial and final states as also discussed under item (1) above.</p>
+</section>
+<section id="compute-for-all-multipoles-and-all-positions-in-a-parallel-setting">
+<h3>(3) Compute for all multipoles and all positions in a parallel setting<a class="headerlink" href="#compute-for-all-multipoles-and-all-positions-in-a-parallel-setting" title="Link to this heading"></a></h3>
+<p>To run calculations in parallel, first save the <code class="code docutils literal notranslate"><span class="pre">Emitters_data</span></code> and <code class="code docutils literal notranslate"><span class="pre">Positions_data</span></code> class objects containing the configurations of the emitter transitions and the spatial positions into json files by using the inbuild <code class="code docutils literal notranslate"><span class="pre">Encode</span></code> methods. For example</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;Em_data.json&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">Em_data</span><span class="o">.</span><span class="n">Encode</span><span class="p">(),</span> <span class="n">f</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Pos_data.json&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">Pos_data</span><span class="o">.</span><span class="n">Encode</span><span class="p">(),</span> <span class="n">f</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Then, the <code class="code docutils literal notranslate"><span class="pre">Vin</span></code> class can be used to create an input file corresponding to the matrix element calculation setting, for example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">vin</span> <span class="o">=</span> <span class="n">Vin</span><span class="p">(</span>
+    <span class="n">emdatafile</span><span class="p">,</span> <span class="c1"># path to Em_data.json</span>
+    <span class="n">posdatafile</span><span class="p">,</span> <span class="c1"># path to Pos_data.json</span>
+    <span class="n">wfdatafiles</span><span class="p">,</span> <span class="c1"># list of paths to WFdata.json files</span>
+    <span class="n">absorber_id</span><span class="p">,</span> <span class="c1"># absorber_id,</span>
+    <span class="n">emitter_id</span><span class="p">,</span> <span class="c1"># source_id,</span>
+    <span class="n">absorber_transitions</span><span class="p">,</span> <span class="c1"># list of transitions</span>
+    <span class="n">nIndex</span><span class="p">,</span> <span class="c1"># refractive index of medium</span>
+    <span class="n">Lmax</span><span class="p">,</span> <span class="c1"># Max multipolar order</span>
+    <span class="n">ws</span><span class="p">,</span> <span class="c1"># Photon energies (rad/s),</span>
+    <span class="n">savepath</span> <span class="o">=</span> <span class="s2">&quot;./&quot;</span><span class="p">,</span>
+    <span class="n">savefile</span> <span class="o">=</span> <span class="s2">&quot;V.json&quot;</span><span class="p">,</span>
+    <span class="n">radtype_abs</span> <span class="o">=</span> <span class="s2">&quot;J&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<span class="n">vin</span><span class="o">.</span><span class="n">write_file</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;v.in&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Finally, the job can be run using the <code class="code docutils literal notranslate"><span class="pre">run.py</span></code> script. For example,</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>srun<span class="w"> </span>python<span class="w"> </span>&lt;path<span class="w"> </span>to<span class="w"> </span>pyRET&gt;/run.py<span class="w"> </span>-in<span class="w"> </span>v.in<span class="w"> </span>&gt;v.out
+</pre></div>
+</div>
+<p>Alternatively,</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>srun<span class="w"> </span>python<span class="w"> </span>pyRET_compute_matrix_elements<span class="w"> </span>-in<span class="w"> </span>v.in<span class="w"> </span>&gt;v.out
+</pre></div>
+</div>
+<p>The output will be a <code class="code docutils literal notranslate"><span class="pre">V.json</span></code> file that can be decoded to the matrix element objects by using</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;V.json&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">V</span> <span class="o">=</span> <span class="n">Vdata</span><span class="p">()</span><span class="o">.</span><span class="n">Decode</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
+<p>[1] S. Chattaraj and G. Galli, Energy transfer between localized emitters in photonic cavities from first principles, Phys. Rev. Research 7, 033229 (2025).</p>
+<p>[2] S. Chattaraj and G. Galli, Energy transfer between localized emitters in photonic cavities from first principles, Phys. Rev. Research 7, 033229 (2025).</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="documentation.html" class="btn btn-neutral float-left" title="Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="credits.html" class="btn btn-neutral float-right" title="Credits" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, University of Chicago and Argonne National Laboratory.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
